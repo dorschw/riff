@@ -8,12 +8,12 @@ class Violation(NamedTuple):
     line_start: int
     message: str
     linter_name: str
+    raw: dict
     is_autofixable: bool | None = None
     fix_suggestion: str | None = None
     line_end: int | None = None
     column_start: int | None = None
     column_end: int | None = None
-
     def to_github_annotation(self: "Violation") -> str:
         endline = self.line_end if self.line_end is not None else self.line_start
         suffix = f"\n{self.fix_suggestion}" if self.fix_suggestion else ""
@@ -26,6 +26,7 @@ class Violation(NamedTuple):
     def parse(raw: dict) -> "Violation":
         fix: dict = raw.get("fix") or {}
         return Violation(
+            raw=raw,
             linter_name="Ruff",
             error_code=raw["code"],
             line_start=raw["location"]["row"],

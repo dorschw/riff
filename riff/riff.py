@@ -1,8 +1,10 @@
+from enum import Enum
+import re
 import subprocess
 import sys
 from collections.abc import Iterable
 from pathlib import Path
-from typing import NoReturn
+from typing import NamedTuple, NoReturn
 
 import typer
 from loguru import logger
@@ -10,8 +12,6 @@ from loguru import logger
 from riff.utils import (
     git_changed_lines,
     parse_ruff_output,
-    split_paths_by_max_len,
-    validate_paths_relative_to_repo,
 )
 from riff.violation import Violation
 
@@ -22,7 +22,7 @@ class LinterErrorsFoundError(Exception):
     ...
 
 
-def run_ruff(paths: list[Path], extra_ruff_args: str) -> subprocess.CompletedProcess:
+def run_ruff(ruff_args: str) -> subprocess.CompletedProcess:
     """
     Runs ruff with the given paths and extra arguments.
 
@@ -33,7 +33,7 @@ def run_ruff(paths: list[Path], extra_ruff_args: str) -> subprocess.CompletedPro
     Returns:
         A tuple containing the output of the 'ruff' command and its exit code.
     """
-    ruff_command = f"ruff {' '.join(str(file) for file in paths)} --format=json {extra_ruff_args}"  # noqa: E501
+    ruff_command = f"ruff {ruff_args} --format=json"
     logger.info(f"running {ruff_command}")
 
     process = subprocess.run(
@@ -43,8 +43,9 @@ def run_ruff(paths: list[Path], extra_ruff_args: str) -> subprocess.CompletedPro
         text=True,
         check=False,
     )
-    if process.returncode not in (0, 1, 2, 127):
-        logger.info(f"ruff exit code:{process.returncode}")
+
+    if process.returncode not in (0, 1, 2):
+        logger.warning(f"ruff quit with exit code {process.returncode}")
 
     return process
 
@@ -72,28 +73,54 @@ def filter_violations(
         ),
     )
 
+class OutputFormat(str, Enum):
+    JSON = "json"
+    GITHUB = "github"
+    NO_OUTPUT = "no_output"
+
+class RuffArgs(NamedTuple):
+    comamnd:str
+    github_format:bool
+
+    @staticmethod
+    def parse(command: str) -> "RuffArgs":
+        command = command.removeprefix("ruff ")
+        command = command.strip()
+
+        output_format = OutputFormat.NO_OUTPUT
+
+        if (format_match := re.match(r"--format[ =](\s+)",command,re.IGNORECASE)):
+            if (format_lower := format_match[1].lower()) in OutputFormat:
+                output_format = OutputFormat[format_lower]
+            else:
+                raise ValueError(f"Unsupported format {output_format}")
+
+        if "--format" in command and (not github):
+            raise ValueError("Using --format is not yet supported")
+
+        return RuffArgs(command, github_format=github)
+
+    @property
+    def first_path(self:"RuffArgs") -> Path:
+        if not self.comamnd:
+            return Path()
+
+        if (path:= Path(self.comamnd.split(" "[0],maxsplit=1))).exists():
+            return path
+        raise ValueError(f"path {path} does not exist")
 
 @app.command()
-def main(  # noqa: PLR0913
-    paths: list[Path],
-    print_github_annotation: bool = False,
-    extra_ruff_args: str = "",
+def main(
+    ruff_command: str,
     always_fail_on: list[str] = [],  # noqa: B006
-    repo_path: Path = Path(),
     base_branch: str = "origin/main",
 ) -> NoReturn:
-    validate_paths_relative_to_repo(paths=paths, repo_path=repo_path)
+    ruff_args = RuffArgs.parse(ruff_command)
 
-    violations: list[Violation] = []
-    for path_group in split_paths_by_max_len(paths):
-        violations.extend(
-            parse_ruff_output(
-                run_ruff(paths=path_group, extra_ruff_args=extra_ruff_args).stdout
-            )
-        )
+    violations = parse_ruff_output(run_ruff(ruff_args=ruff_command).stdout)
 
     path_to_modified_lines = git_changed_lines(
-        repo_path=repo_path, base_branch=base_branch
+        repo_path=ruff_args.first_path, base_branch=base_branch
     )
 
     if filtered_violations := filter_violations(
@@ -104,7 +131,7 @@ def main(  # noqa: PLR0913
         for violation in filtered_violations:
             logger.error(violation)
 
-            if print_github_annotation:
+            if ruff_args.github_format:
                 print(  # noqa: T201 required for GitHub Annotations
                     violation.to_github_annotation(),
                 )
