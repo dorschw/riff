@@ -20,6 +20,10 @@ pre-commit = "^3.3.3"
 black = "^23.7.0"
 pytest = "^7.4.0"
 
+[tool.poetry.scripts]
+riff = "riff.riff:app"
+
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

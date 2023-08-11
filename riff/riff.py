@@ -7,13 +7,13 @@ from typing import NoReturn
 import typer
 from loguru import logger
 
-from utils import (
+from riff.utils import (
     git_changed_lines,
     parse_ruff_output,
     split_paths_by_max_len,
     validate_paths_relative_to_repo,
 )
-from violation import Violation
+from riff.violation import Violation
 
 app = typer.Typer(no_args_is_help=True, invoke_without_command=True)
 
@@ -24,31 +24,27 @@ class LinterErrorsFoundError(Exception):
 
 def run_ruff(paths: list[Path], extra_ruff_args: str) -> subprocess.CompletedProcess:
     """
-    Runs ruff with the given files and extra arguments.
+    Runs ruff with the given paths and extra arguments.
 
     Args:
-        files: A list of file paths.
+        paths: A list of file paths.
         extra_ruff_args: Additional arguments for the 'ruff' command.
 
     Returns:
         A tuple containing the output of the 'ruff' command and its exit code.
     """
-
-    ruff_command = f"ruff {','.join(str(file) for file in paths)} --format=json {extra_ruff_args}"  # noqa: E501
+    ruff_command = f"ruff {' '.join(str(file) for file in paths)} --format=json {extra_ruff_args}"  # noqa: E501
     logger.info(f"running {ruff_command}")
-
-    with logger.catch(
-        subprocess.CalledProcessError, message="Failed running ruff", reraise=True
-    ):
-        process = subprocess.run(
-            ruff_command,
-            shell=True,  # noqa: S602
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        logger.debug(f"ruff output:\n{process.stdout}")
-        logger.debug(f"ruff exit code:{process.returncode}")
+    3
+    process = subprocess.run(
+        ruff_command,
+        shell=True,  # noqa: S602
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if process.returncode not in (0,1,127):
+        logger.info(f"ruff exit code:{process.returncode}")
 
     return process
 
@@ -56,8 +52,10 @@ def run_ruff(paths: list[Path], extra_ruff_args: str) -> subprocess.CompletedPro
 def filter_violations(
     violations: Iterable[Violation],
     git_modified_lines: dict[Path, set[int]],
-    always_fail_on: set[str] | frozenset = frozenset(),
+    always_fail_on: Iterable[str] | None,
 ) -> tuple[Violation, ...]:
+    always_fail_on = set(always_fail_on) if always_fail_on else set()
+
     return tuple(
         sorted(
             (
@@ -76,12 +74,13 @@ def filter_violations(
 
 
 @app.command()
-def main(
+def main(  # noqa: PLR0913
     paths: list[Path],
-    repo_path: Path,
-    print_github_annotation: bool,
-    extra_ruff_args: str,
-    base_branch: str = "origin/master",
+    print_github_annotation: bool = False,
+    extra_ruff_args: str = "",
+    always_fail_on: list[str] = (),
+    repo_path: Path = Path(),
+    base_branch: str = "origin/main",
 ) -> NoReturn:
     validate_paths_relative_to_repo(paths=paths, repo_path=repo_path)
 
@@ -89,7 +88,7 @@ def main(
     for path_group in split_paths_by_max_len(paths):
         violations.extend(
             parse_ruff_output(
-                run_ruff(paths=path_group, extra_ruff_args=extra_ruff_args).output
+                run_ruff(paths=path_group, extra_ruff_args=extra_ruff_args).stdout
             )
         )
 
@@ -97,7 +96,9 @@ def main(
         repo_path=repo_path, base_branch=base_branch
     )
 
-    if filtered_violations := filter_violations(violations, path_to_modified_lines):
+    if filtered_violations := filter_violations(
+        violations, path_to_modified_lines, always_fail_on=always_fail_on
+    ):
         logger.info(f"Found {len(filtered_violations)}")
 
         for violation in filtered_violations:

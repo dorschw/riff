@@ -6,7 +6,7 @@ from git.repo import Repo
 from loguru import logger
 from unidiff import PatchSet
 
-from violation import Violation
+from riff.violation import Violation
 
 
 def split_paths_by_max_len(
@@ -44,14 +44,15 @@ def split_paths_by_max_len(
 
 
 def validate_paths_relative_to_repo(paths: list[Path], repo_path: Path) -> None:
+    repo_path = repo_path.resolve()
     for path in paths:
         with logger.catch(
             ValueError,
             level="ERROR",
-            message=f"{path} is not relative to {repo_path=}, may lead to false negatives",
+            message=f"{path} is not relative to {repo_path=}",
             reraise=False,
         ):
-            path.relative_to(repo_path)
+            path.absolute().relative_to(repo_path)
 
 
 def parse_ruff_output(ruff_result_raw: str) -> tuple[Violation, ...]:
@@ -64,7 +65,7 @@ def parse_ruff_output(ruff_result_raw: str) -> tuple[Violation, ...]:
 
 
 def git_changed_lines(
-    path: Path,
+    repo_path: Path,
     base_branch: str,
 ) -> dict[Path, set[int]]:
     """Returns
@@ -79,7 +80,7 @@ def git_changed_lines(
             if line.is_removed and line.value.strip()
         }
 
-    repo = Repo(path, search_parent_directories=True)
+    repo = Repo(repo_path, search_parent_directories=True)
 
     result = {
         Path(patch.file_path): parse_modified_lines(patch)

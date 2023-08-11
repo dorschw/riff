@@ -24,7 +24,7 @@ class Violation(NamedTuple):
 
     @staticmethod
     def parse(raw: dict) -> "Violation":
-        fix: dict = raw.get("fix", {})
+        fix: dict = raw.get("fix") or {}
         return Violation(
             linter_name="Ruff",
             error_code=raw["code"],
