@@ -35,7 +35,7 @@ def run_ruff(paths: list[Path], extra_ruff_args: str) -> subprocess.CompletedPro
     """
     ruff_command = f"ruff {' '.join(str(file) for file in paths)} --format=json {extra_ruff_args}"  # noqa: E501
     logger.info(f"running {ruff_command}")
-    3
+
     process = subprocess.run(
         ruff_command,
         shell=True,  # noqa: S602
@@ -43,7 +43,7 @@ def run_ruff(paths: list[Path], extra_ruff_args: str) -> subprocess.CompletedPro
         text=True,
         check=False,
     )
-    if process.returncode not in (0,1,127):
+    if process.returncode not in (0, 1, 2, 127):
         logger.info(f"ruff exit code:{process.returncode}")
 
     return process
@@ -78,7 +78,7 @@ def main(  # noqa: PLR0913
     paths: list[Path],
     print_github_annotation: bool = False,
     extra_ruff_args: str = "",
-    always_fail_on: list[str] = (),
+    always_fail_on: list[str] = [],  # noqa: B006
     repo_path: Path = Path(),
     base_branch: str = "origin/main",
 ) -> NoReturn:
@@ -109,6 +109,8 @@ def main(  # noqa: PLR0913
                     violation.to_github_annotation(),
                 )
         sys.exit(1)
+
+    logger.info("No ruff violations found :)")
     sys.exit(0)
 
 

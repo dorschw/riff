@@ -81,9 +81,8 @@ def git_changed_lines(
         }
 
     repo = Repo(repo_path, search_parent_directories=True)
-
     result = {
-        Path(patch.file_path): parse_modified_lines(patch)
+        Path(patch.path): parse_modified_lines(patch)
         for patch in PatchSet(
             repo.git.diff(
                 "HEAD",
@@ -93,5 +92,5 @@ def git_changed_lines(
             ),
         )
     }
-    logger.debug(f"Modified lines:\n{pprint.pformat(result)}")
+    logger.debug(f"Modified lines:\n{pprint.pformat(result,compact=True)}")
     return result
