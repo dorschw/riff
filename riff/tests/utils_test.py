@@ -13,7 +13,7 @@ def test_parse_ruff_output_valid_one() -> None:
     end_row = 3
     end_column = 4
     error_message = "Error message"
-    fix_suggestion= "Fix suggestion"
+    fix_suggestion = "Fix suggestion"
 
     mocked_ruff_output = json.dumps(
         [
@@ -22,7 +22,7 @@ def test_parse_ruff_output_valid_one() -> None:
                 "filename": file,
                 "location": {"row": start_row, "column": start_column},
                 "end_location": {"row": end_row, "column": end_column},
-                "message":error_message,
+                "message": error_message,
                 "fix": {"message": fix_suggestion},
             }
         ]
