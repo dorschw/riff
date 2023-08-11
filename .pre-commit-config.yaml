@@ -42,3 +42,13 @@ repos:
       rev: 36.42.1
       hooks:
         - id: renovate-config-validator
+
+    -   repo: local
+        hooks:
+        -   id: pytest
+            name: pytest
+            language: system
+            entry: poetry run pytest -s -v .
+            types: [python]
+            pass_filenames: false
+            always_run: true
