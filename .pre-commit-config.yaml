@@ -1,0 +1,41 @@
+exclude: demisto_sdk/tests/test_files/.*|.circleci/config.yml|demisto_sdk/commands/.*/tests/test_files/.*
+repos:
+    - repo: https://github.com/charliermarsh/ruff-pre-commit
+      rev: "v0.0.284"
+      hooks:
+        - id: ruff
+          args: [--fix, --exit-non-zero-on-fix]
+
+    - repo: https://github.com/psf/black
+      rev: "23.7.0"
+      hooks:
+          - id: black
+
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v4.4.0
+      hooks:
+          - id: trailing-whitespace
+          - id: end-of-file-fixer
+          - id: check-docstring-first
+          - id: check-json
+            exclude: .vscode/.*
+          - id: check-yaml
+            language_version: python3
+          - id: name-tests-test
+
+    - repo: https://github.com/pre-commit/mirrors-mypy
+      rev: v1.4.1
+      hooks:
+          - id: mypy
+            exclude: tests/.*|demisto_sdk/commands/init/templates/.*
+            language: system
+
+    - repo: https://gitlab.com/smop/pre-commit-hooks
+      rev: v1.0.0
+      hooks:
+          - id: check-poetry
+
+    - repo: https://github.com/abravalheri/validate-pyproject
+      rev: v0.13
+      hooks:
+          - id: validate-pyproject
