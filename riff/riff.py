@@ -46,7 +46,9 @@ def run_ruff(
         If the `ruff` command exits with a non-zero status code, the returncode attribute
         of the returned CompletedProcess object will reflect that status code.
     """
-    if "--format" in ruff_args:
+    if not ruff_args:
+        ruff_args = ["."]
+    elif "--format" in ruff_args:
         logger.error("the `--format` argument is not (yet) supported")
         raise ArgumentNotSupportedError
 
@@ -127,7 +129,6 @@ def main(  # dead: disable
     base_branch: str = "origin/main",
 ) -> NoReturn:
     validate_repo_path()  # raises if a repo isn't found at cwd or above
-
     if not (modified_lines := parse_git_modified_lines(base_branch)):
         raise typer.Exit(1)
 
