@@ -24,7 +24,6 @@ ipykernel = "^6.25.1"
 [tool.poetry.scripts]
 riff = "riff.riff:app"
 
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
