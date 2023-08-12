@@ -3,6 +3,7 @@ from typing import NamedTuple
 
 
 class Violation(NamedTuple):
+    raw: dict
     error_code: str
     path: Path
     line_start: int
@@ -26,6 +27,7 @@ class Violation(NamedTuple):
     def parse(raw: dict) -> "Violation":
         fix: dict = raw.get("fix") or {}
         return Violation(
+            raw=raw,
             linter_name="Ruff",
             error_code=raw["code"],
             line_start=raw["location"]["row"],
