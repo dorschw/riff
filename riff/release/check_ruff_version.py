@@ -6,7 +6,7 @@ from packaging.version import Version
 
 def get_latest_ruff_version() -> Version:
     response = requests.get("https://pypi.org/pypi/ruff/json", timeout=5).json()
-    return max(Version, map(response["releases"].keys()))  # type:ignore[call-overload]
+    return max(map(Version, response["releases"].keys()))  # type:ignore[call-overload]
 
 
 def get_latest_tag() -> Version:
