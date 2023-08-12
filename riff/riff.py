@@ -72,8 +72,8 @@ def filter_violations(
                 violation
                 for violation in violations
                 if (
-                    violation.line_start in git_modified_lines.get(violation.path, ())
-                    or violation.error_code in always_fail_on
+                    (violation.line_start in git_modified_lines.get(violation.path, ()))
+                    or (violation.error_code in always_fail_on)
                 )
             ),
             key=lambda violation: str(
