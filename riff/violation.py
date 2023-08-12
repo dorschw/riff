@@ -3,6 +3,22 @@ from typing import NamedTuple
 
 
 class Violation(NamedTuple):
+    """
+    Represents a code violation reported by a linter.
+
+    Attributes:
+        error_code (str): The error code associated with the violation.
+        path (Path): The file path where the violation occurred.
+        line_start (int): The starting line number of the violation.
+        message (str): The detailed description of the violation.
+        linter_name (str): The name of the linter that reported the violation.
+        is_autofixable (bool, optional): Indicates whether the violation is autofixable.
+        fix_suggestion (str, optional): Suggested fix for the violation.
+        line_end (int, optional): The ending line number of the violation.
+        column_start (int, optional): The starting column number of the violation.
+        column_end (int, optional): The ending column number of the violation.
+    """
+
     error_code: str
     path: Path
     line_start: int
@@ -17,7 +33,7 @@ class Violation(NamedTuple):
     def to_github_annotation(self: "Violation") -> str:
         endline = self.line_end if self.line_end is not None else self.line_start
         suffix = f"\n{self.fix_suggestion}" if self.fix_suggestion else ""
-        return f"::error file={self.path},line={self.line_start},endline={endline},title={self.linter_name}:{self.error_code}{suffix}".replace(  # noqa: E501
+        return f"::error file={self.path},line={self.line_start},endline={endline},title={self.linter_name}:{self.error_code}{suffix}".replace(
             "\n",
             "%0A",  # GitHub annotations syntax
         )

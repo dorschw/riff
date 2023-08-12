@@ -24,14 +24,27 @@ def run_ruff(
     ruff_args: list[str],
 ) -> subprocess.CompletedProcess:
     """
-    Runs ruff with the given paths and extra arguments.
+    Run Ruff with the given arguments.
+
+    This function executes the 'ruff' command-line tool with the specified arguments.
+    It captures the output and exit code of the command and returns a `subprocess.CompletedProcess`
+    object containing this information.
 
     Args:
-        paths: A list of file paths.
-        extra_ruff_args: Additional arguments for the 'ruff' command.
+        ruff_args (list[str]): A list of arguments to be passed to the 'ruff' command.
 
     Returns:
-        A tuple containing the output of the 'ruff' command and its exit code.
+        subprocess.CompletedProcess: A named tuple with the following attributes:
+            - args: The list of arguments used to launch the 'ruff' command.
+            - returncode: The exit status of the 'ruff' command process.
+            - stdout: The standard output (stdout) of the 'ruff' command as a string.
+            - stderr: The standard error (stderr) of the 'ruff' command as a string.
+    Raises:
+        ArgumentNotSupportedError: Raised if the `--format` argument is included in ruff_args.
+
+    Note:
+        If the `ruff` command exits with a non-zero status code, the returncode attribute
+        of the returned CompletedProcess object will reflect that status code.
     """
     if "--format" in ruff_args:
         logger.error("the `--format` argument is not (yet) supported")
@@ -65,26 +78,34 @@ def filter_violations(
     always_fail_on: Iterable[str] | None,
 ) -> tuple[Violation, ...]:
     always_fail_on = set(always_fail_on) if always_fail_on else set()
+    """
+    Filters a collection of violations based on certain criteria.
 
-    result = []
-    for violation in violations:
-        if violation.error_code in always_fail_on:
-            result.append(violation)
-            continue
+    This function takes a collection of violations, a dictionary of Git-modified lines,
+    and a set of error codes that should always result in a failure.
+    It filters the violations based on whether they meet any of the following conditions:
+    1. The error code is in the `always_fail_on` set.
+    2. The starting line of the violation is among the modified lines for the corresponding file.
 
-        if violation.path not in git_modified_lines:
-            logger.warning(f"{violation.path} not found in git diff")
-            continue
+    Parameters:
+    - violations (Iterable[Violation]): A collection of violation objects to be filtered.
+    - git_modified_lines (dict[Path, set[int]]): A dictionary where keys are file paths and values
+      are sets of modified line numbers for each file.
+    - always_fail_on (Iterable[str] | None): A collection of error codes that should always
+      result in a failure. If None, no error codes are treated as always failing.
 
-        if violation.line_start in git_modified_lines[violation.path]:
-            result.append(violation)
-        else:
-            logger.debug(
-                f"ignoring violation of {violation.error_code} in {violation.path} line {violation.line_start}"  # noqa: E501
-            )
+    Returns:
+    tuple[Violation, ...]: A tuple of sorted violation objects that meet the filtering criteria.
+    """
+
     return tuple(
         sorted(
-            result,
+            (
+                violation
+                for violation in violations
+                if (violation.error_code in always_fail_on)
+                or (violation.line_start in git_modified_lines.get(violation.path, ()))
+            ),
             key=lambda violation: str(
                 (violation.path, violation.line_start, violation.error_code),
             ),

@@ -30,7 +30,17 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
 select = ["ALL"]
-ignore = ["D", "TD", "FBT", "TRY003", "EM102", "COM812", "S101", "INP001"]
+ignore = [
+    "D",
+    "TD",
+    "FBT",
+    "TRY003",
+    "EM102",
+    "COM812",
+    "S101",
+    "INP001",
+    "E501",
+]
 target-version = "py310"
 line-length = 88
 
