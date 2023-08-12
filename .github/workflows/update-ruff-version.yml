@@ -11,4 +11,4 @@ jobs:
     - uses: snok/install-poetry@v1
     - run: poetry install
     - run: poetry run python riff/release/check_ruff_version.py
-    - run: echo {{steps.sync-ruff.outputs.newer_ruff_version}}
+    - run: echo ${{steps.sync-ruff.outputs.newer_ruff_version}}
