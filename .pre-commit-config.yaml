@@ -1,4 +1,3 @@
-exclude: demisto_sdk/tests/test_files/.*|.circleci/config.yml|demisto_sdk/commands/.*/tests/test_files/.*
 repos:
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: "v0.0.284"
@@ -32,16 +31,18 @@ repos:
     rev: v1.0.0
     hooks:
       - id: check-poetry
+        stages: [push]
 
   - repo: https://github.com/abravalheri/validate-pyproject
     rev: v0.13
     hooks:
       - id: validate-pyproject
-
+        stages: [push]
   - repo: https://github.com/renovatebot/pre-commit-hooks
     rev: 36.42.1
     hooks:
       - id: renovate-config-validator
+        stages: [push]
 
   - repo: https://github.com/asottile/dead
     rev: v1.5.2
