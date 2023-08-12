@@ -16,10 +16,6 @@ from riff.violation import Violation
 app = typer.Typer(no_args_is_help=True, invoke_without_command=True)
 
 
-class LinterErrorsFoundError(Exception):
-    ...
-
-
 def run_ruff(
     paths: list[Path],
     ruff_args: list[str],
@@ -87,7 +83,7 @@ def filter_violations(
         "ignore_unknown_options": True,
     }
 )
-def main(
+def main(  # dead: disable
     # typer doesn't support `| None`
     context: typer.Context,  # ruff args
     paths: list[Path] = None,  # type:ignore[assignment] # noqa: RUF013

@@ -11,52 +11,6 @@ from unidiff import PatchedFile, PatchSet
 from riff.violation import Violation
 
 
-def split_paths_by_max_len(
-    paths: list[Path],
-    max_length_sum: int = 4000,
-) -> list[list[Path]]:
-    """
-    Splits a list of Path objects into sublists based on their total length.
-
-    Args:
-        paths (List[Path]): A list of Path objects.
-        max_length_sum (int): The maximum total length of each sublist. Default is 4000.
-
-    Returns:
-        List[List[Path]]: A list of sublists, where each has a maximum total length.
-    """
-    result: list[list[Path]] = []
-    current_list: list[Path] = []
-    current_length_sum = 0
-
-    for path in sorted(set(paths), key=lambda x: len(str(x))):
-        path_length = len(str(path))
-        if path_length >= max_length_sum:
-            raise ValueError(f"Path is longer than {max_length_sum}: {path}")
-        if current_length_sum + path_length <= max_length_sum:
-            current_list.append(path)
-            current_length_sum += path_length
-        else:  # exceeded max length
-            result.append(current_list)
-            current_list = [path]
-            current_length_sum = path_length
-    if current_list:
-        result.append(current_list)
-    return result
-
-
-def validate_paths_relative_to_repo(paths: list[Path], repo_path: Path) -> None:
-    repo_path = repo_path.resolve()
-    for path in paths:
-        with logger.catch(
-            ValueError,
-            level="ERROR",
-            message=f"{path} is not relative to {repo_path=}",
-            reraise=False,
-        ):
-            path.absolute().relative_to(repo_path)
-
-
 def parse_ruff_output(ruff_result_raw: str) -> tuple[Violation, ...]:
     if not ruff_result_raw:
         return ()

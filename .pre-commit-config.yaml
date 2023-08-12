@@ -42,3 +42,7 @@ repos:
       rev: 36.42.1
       hooks:
         - id: renovate-config-validator
+    -   repo: https://github.com/asottile/dead
+        rev: v1.5.2
+        hooks:
+        -   id: dead
