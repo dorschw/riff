@@ -75,10 +75,10 @@ def parse_git_changed_lines(
     3
     def parse_modified_lines(patched_file: PatchedFile) -> set[int]:
         return {
-            line.source_line_no
+            line.target_line_no
             for hunk in patched_file
             for line in hunk
-            if line.is_removed and line.value.strip()
+            if line.is_added and line.value.strip()
         }
 
     repo = Repo(search_parent_directories=True)
@@ -86,7 +86,6 @@ def parse_git_changed_lines(
         Path(patched_file.path): parse_modified_lines(patched_file)
         for patched_file in PatchSet(
             repo.git.diff(
-                "HEAD",
                 base_branch,
                 ignore_blank_lines=True,
                 ignore_space_at_eol=True,
