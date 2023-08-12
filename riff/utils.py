@@ -75,6 +75,7 @@ def parse_git_changed_lines(
     """Returns
     Dict[Path, Tuple[int]]: maps modified files, to the indices of the lines changed.
     """
+
     def parse_modified_lines(patched_file: PatchedFile) -> set[int]:
         return {
             line.target_line_no
@@ -95,7 +96,16 @@ def parse_git_changed_lines(
         )
     }
     if result:
-        logger.debug(f"modified lines:\n{pprint.pformat(result,compact=True)}")
+        logger.debug(
+            "modified lines:\n"
+            + pprint.pformat(
+                {
+                    str(file): sorted(changed_lines)
+                    for file, changed_lines in result.items()
+                },
+                compact=True,
+            )
+        )
     else:
         repo_path = Path(repo.git_dir).parent.resolve()
         logger.error(

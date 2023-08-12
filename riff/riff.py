@@ -85,7 +85,7 @@ def filter_violations(
     context_settings={
         "allow_extra_args": True,
         "ignore_unknown_options": True,
-    }  # noqa: E501
+    }
 )
 def main(
     # typer doesn't support `| None`
