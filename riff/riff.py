@@ -1,6 +1,7 @@
 import subprocess
 from collections.abc import Iterable
 from pathlib import Path
+from pprint import pprint
 from typing import NoReturn
 
 import typer
@@ -65,7 +66,8 @@ def filter_violations(
     always_fail_on: Iterable[str] | None,
 ) -> tuple[Violation, ...]:
     always_fail_on = set(always_fail_on) if always_fail_on else set()
-
+    pprint(git_modified_lines)  # noqa: T203
+    pprint(violations)  # noqa: T203
     return tuple(
         sorted(
             (
