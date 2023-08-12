@@ -16,8 +16,11 @@ from riff.violation import Violation
 app = typer.Typer(no_args_is_help=True, invoke_without_command=True)
 
 
+class ArgumentNotSupportedError(Exception):
+    ...
+
+
 def run_ruff(
-    paths: list[Path],
     ruff_args: list[str],
 ) -> subprocess.CompletedProcess:
     """
@@ -30,10 +33,13 @@ def run_ruff(
     Returns:
         A tuple containing the output of the 'ruff' command and its exit code.
     """
+    if "--format" in ruff_args:
+        logger.error("the `--format` argument is not (yet) supported")
+        raise ArgumentNotSupportedError
+
     ruff_command = " ".join(
         (
             "ruff",
-            *map(str, paths),
             *ruff_args,
             "--format=json",
         )
@@ -86,7 +92,6 @@ def filter_violations(
 def main(  # dead: disable
     # typer doesn't support `| None`
     context: typer.Context,  # ruff args
-    paths: list[Path] = None,  # type:ignore[assignment] # noqa: RUF013
     always_fail_on: list[str] = None,  # type:ignore[assignment] # noqa: RUF013
     print_github_annotation: bool = False,
     base_branch: str = "origin/main",
@@ -95,7 +100,10 @@ def main(  # dead: disable
     if not (changed_lines := parse_git_changed_lines(base_branch)):
         raise typer.Exit(1)
 
-    ruff_process_result = run_ruff(paths or [Path()], context.args)
+    try:
+        ruff_process_result = run_ruff(context.args)
+    except ArgumentNotSupportedError:
+        raise typer.Exit(1) from None
 
     if filtered_violations := filter_violations(
         violations=parse_ruff_output(ruff_process_result.stdout),
