@@ -5,9 +5,9 @@ from pathlib import Path
 import git
 import typer
 from git.repo import Repo
-from loguru import logger
 from unidiff import PatchedFile, PatchSet
 
+from riff.logger import logger
 from riff.violation import Violation
 
 
@@ -23,7 +23,7 @@ def parse_ruff_output(ruff_result_raw: str) -> tuple[Violation, ...]:
     return violations
 
 
-def parse_git_changed_lines(
+def parse_git_modified_lines(
     base_branch: str,
 ) -> dict[Path, set[int]]:
     """Returns
@@ -39,8 +39,10 @@ def parse_git_changed_lines(
         }
 
     repo = Repo(search_parent_directories=True)
+    repo_root = Path(repo.git_dir).parent
+
     result = {
-        Path(patched_file.path): parse_modified_lines(patched_file)
+        Path(repo_root, patched_file.path): parse_modified_lines(patched_file)
         for patched_file in PatchSet(
             repo.git.diff(
                 base_branch,
@@ -61,16 +63,15 @@ def parse_git_changed_lines(
             )
         )
     else:
-        repo_path = Path(repo.git_dir).parent.resolve()
         logger.error(
-            f"could not find any git-modified lines in {repo_path}: Are the files committed?"  # noqa: E501
+            f"could not find any git-modified lines in {repo_root}: Are the files committed?"  # noqa: E501
         )
     return result
 
 
-def validate_repo_path() -> None:
+def validate_repo_path() -> Path:
     try:
-        git.Repo(search_parent_directories=True)
+        return Path(git.Repo(search_parent_directories=True).git_dir).parent.resolve()
     except git.exc.InvalidGitRepositoryError:
         logger.error(f"Cannot detect repository in {Path().resolve()}")
         raise typer.Exit(1) from None  # no need for whole stack trace

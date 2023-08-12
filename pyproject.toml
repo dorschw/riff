@@ -34,3 +34,6 @@ select = ["ALL"]
 ignore = ["D", "TD", "FBT", "TRY003", "EM102", "COM812", "S101", "INP001"]
 target-version = "py310"
 line-length = 88
+
+[tool.ruff.flake8-tidy-imports.banned-api]
+"loguru".msg = "use riff.logger instead"

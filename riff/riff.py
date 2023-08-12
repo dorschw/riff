@@ -4,10 +4,10 @@ from pathlib import Path
 from typing import NoReturn
 
 import typer
-from loguru import logger
 
+from riff.logger import logger
 from riff.utils import (
-    parse_git_changed_lines,
+    parse_git_modified_lines,
     parse_ruff_output,
     validate_repo_path,
 )
@@ -66,20 +66,29 @@ def filter_violations(
 ) -> tuple[Violation, ...]:
     always_fail_on = set(always_fail_on) if always_fail_on else set()
 
+    result = []
+    for violation in violations:
+        if violation.error_code in always_fail_on:
+            result.append(violation)
+            continue
+
+        if violation.path not in git_modified_lines:
+            logger.warning(f"{violation.path} not found in git diff")
+            continue
+
+        if violation.line_start in git_modified_lines[violation.path]:
+            result.append(violation)
+        else:
+            logger.debug(
+                f"ignoring violation of {violation.error_code} in {violation.path} line {violation.line_start}"  # noqa: E501
+            )
     return tuple(
         sorted(
-            (
-                violation
-                for violation in violations
-                if (
-                    violation.line_start in git_modified_lines.get(violation.path, ())
-                    or violation.error_code in always_fail_on
-                )
-            ),
+            result,
             key=lambda violation: str(
                 (violation.path, violation.line_start, violation.error_code),
             ),
-        ),
+        )
     )
 
 
@@ -97,7 +106,8 @@ def main(  # dead: disable
     base_branch: str = "origin/main",
 ) -> NoReturn:
     validate_repo_path()  # raises if a repo isn't found at cwd or above
-    if not (changed_lines := parse_git_changed_lines(base_branch)):
+
+    if not (modified_lines := parse_git_modified_lines(base_branch)):
         raise typer.Exit(1)
 
     try:
@@ -107,7 +117,7 @@ def main(  # dead: disable
 
     if filtered_violations := filter_violations(
         violations=parse_ruff_output(ruff_process_result.stdout),
-        git_modified_lines=changed_lines,
+        git_modified_lines=modified_lines,
         always_fail_on=(always_fail_on or []),
     ):
         logger.info(f"Found {len(filtered_violations)} ruff violations")
