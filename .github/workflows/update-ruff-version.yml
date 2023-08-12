@@ -11,7 +11,4 @@ jobs:
     - uses: snok/install-poetry@v1
     - run: poetry install
     - run: poetry run python riff/release/check_ruff_version.py
-    - name: Check Ruff Version and Take Action
-      if: steps.sync-ruff.outputs.newer_ruff_version == 'false'
-      run: |
-        echo "ruff is not newer"
+    - run: echo {{steps.sync-ruff.outputs.newer_ruff_version}}
