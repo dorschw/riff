@@ -2,77 +2,35 @@ import json
 import pprint
 from pathlib import Path
 
+import git
+import typer
 from git.repo import Repo
 from loguru import logger
-from unidiff import PatchSet
+from unidiff import PatchedFile, PatchSet
 
 from riff.violation import Violation
 
 
-def split_paths_by_max_len(
-    paths: list[Path],
-    max_length_sum: int = 4000,
-) -> list[list[Path]]:
-    """
-    Splits a list of Path objects into sublists based on their total length.
-
-    Args:
-        paths (List[Path]): A list of Path objects.
-        max_length_sum (int): The maximum total length of each sublist. Default is 4000.
-
-    Returns:
-        List[List[Path]]: A list of sublists, where each has a maximum total length.
-    """
-    result: list[list[Path]] = []
-    current_list: list[Path] = []
-    current_length_sum = 0
-
-    for path in sorted(set(paths), key=lambda x: len(str(x))):
-        path_length = len(str(path))
-        if path_length >= max_length_sum:
-            raise ValueError(f"Path is longer than {max_length_sum}: {path}")
-        if current_length_sum + path_length <= max_length_sum:
-            current_list.append(path)
-            current_length_sum += path_length
-        else:  # exceeded max length
-            result.append(current_list)
-            current_list = [path]
-            current_length_sum = path_length
-    if current_list:
-        result.append(current_list)
-    return result
-
-
-def validate_paths_relative_to_repo(paths: list[Path], repo_path: Path) -> None:
-    repo_path = repo_path.resolve()
-    for path in paths:
-        with logger.catch(
-            ValueError,
-            level="ERROR",
-            message=f"{path} is not relative to {repo_path=}",
-            reraise=False,
-        ):
-            path.absolute().relative_to(repo_path)
-
-
 def parse_ruff_output(ruff_result_raw: str) -> tuple[Violation, ...]:
+    if not ruff_result_raw:
+        return ()
+
     with logger.catch(json.JSONDecodeError, reraise=True):
         raw_violations = json.loads(ruff_result_raw)
 
     violations = tuple(map(Violation.parse, raw_violations))
-    logger.info(f"Parsed {len(violations)} Ruff violations")
+    logger.debug(f"parsed {len(violations)} ruff violations")
     return violations
 
 
-def git_changed_lines(
-    repo_path: Path,
+def parse_git_changed_lines(
     base_branch: str,
 ) -> dict[Path, set[int]]:
     """Returns
     Dict[Path, Tuple[int]]: maps modified files, to the indices of the lines changed.
     """
 
-    def parse_modified_lines(patched_file: PatchSet) -> set[int]:
+    def parse_modified_lines(patched_file: PatchedFile) -> set[int]:
         return {
             line.target_line_no
             for hunk in patched_file
@@ -80,10 +38,10 @@ def git_changed_lines(
             if line.is_added and line.value.strip()
         }
 
-    repo = Repo(repo_path, search_parent_directories=True)
+    repo = Repo(search_parent_directories=True)
     result = {
-        Path(patch.path): parse_modified_lines(patch)
-        for patch in PatchSet(
+        Path(patched_file.path): parse_modified_lines(patched_file)
+        for patched_file in PatchSet(
             repo.git.diff(
                 base_branch,
                 ignore_blank_lines=True,
@@ -91,5 +49,28 @@ def git_changed_lines(
             ),
         )
     }
-    logger.debug(f"Modified lines:\n{pprint.pformat(result, compact=True)}")
+    if result:
+        logger.debug(
+            "modified lines:\n"
+            + pprint.pformat(
+                {
+                    str(file): sorted(changed_lines)
+                    for file, changed_lines in result.items()
+                },
+                compact=True,
+            )
+        )
+    else:
+        repo_path = Path(repo.git_dir).parent.resolve()
+        logger.error(
+            f"could not find any git-modified lines in {repo_path}: Are the files committed?"  # noqa: E501
+        )
     return result
+
+
+def validate_repo_path() -> None:
+    try:
+        git.Repo(search_parent_directories=True)
+    except git.exc.InvalidGitRepositoryError:
+        logger.error(f"Cannot detect repository in {Path().resolve()}")
+        raise typer.Exit(1) from None  # no need for whole stack trace
