@@ -15,5 +15,5 @@ logger.info(f"{ruff_version=}")
 logger.info(f"{riff_version=}")
 
 print(  # noqa: T201
-    f"::set-output name=newer_ruff_version::{ruff_version > Version(riff_version.base_version)}"
+    f"::newer_ruff_version={ruff_version > Version(riff_version.base_version)}"
 )
