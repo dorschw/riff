@@ -1,5 +1,4 @@
 import subprocess
-import sys
 from collections.abc import Iterable
 from pathlib import Path
 from typing import NoReturn
@@ -8,10 +7,9 @@ import typer
 from loguru import logger
 
 from riff.utils import (
-    git_changed_lines,
+    parse_git_changed_lines,
     parse_ruff_output,
-    split_paths_by_max_len,
-    validate_paths_relative_to_repo,
+    validate_repo_path,
 )
 from riff.violation import Violation
 
@@ -22,7 +20,9 @@ class LinterErrorsFoundError(Exception):
     ...
 
 
-def run_ruff(paths: list[Path], extra_ruff_args: str) -> subprocess.CompletedProcess:
+def run_ruff(
+    paths: list[Path], additional_ruff_args: str
+) -> subprocess.CompletedProcess:
     """
     Runs ruff with the given paths and extra arguments.
 
@@ -33,8 +33,15 @@ def run_ruff(paths: list[Path], extra_ruff_args: str) -> subprocess.CompletedPro
     Returns:
         A tuple containing the output of the 'ruff' command and its exit code.
     """
-    ruff_command = f"ruff {' '.join(str(file) for file in paths)} --format=json {extra_ruff_args}"  # noqa: E501
-    logger.info(f"running {ruff_command}")
+    ruff_command = " ".join(
+        (
+            "ruff",
+            *map(str, paths),
+            "--format=json",
+            additional_ruff_args,
+        )
+    ).rstrip()
+    logger.debug(f"running '{ruff_command}'")
 
     process = subprocess.run(
         ruff_command,
@@ -74,33 +81,25 @@ def filter_violations(
 
 
 @app.command()
-def main(  # noqa: PLR0913
+def main(
     paths: list[Path],
     print_github_annotation: bool = False,
-    extra_ruff_args: str = "",
-    always_fail_on: list[str] = [],  # noqa: B006
-    repo_path: Path = Path(),
+    ruff_args: str = "",
+    always_fail_on: list[str] = None,  # noqa:RUF013
     base_branch: str = "origin/main",
 ) -> NoReturn:
-    validate_paths_relative_to_repo(paths=paths, repo_path=repo_path)
+    validate_repo_path()  # raises if a repo isn't found at cwd or above
+    if not (changed_lines := parse_git_changed_lines(base_branch)):
+        raise typer.Exit(1)
 
-    violations: list[Violation] = []
-    for path_group in split_paths_by_max_len(paths):
-        violations.extend(
-            parse_ruff_output(
-                run_ruff(paths=path_group, extra_ruff_args=extra_ruff_args).stdout
-            )
-        )
-
-    path_to_modified_lines = git_changed_lines(
-        repo_path=repo_path, base_branch=base_branch
-    )
+    ruff_process_result = run_ruff(paths, ruff_args)
 
     if filtered_violations := filter_violations(
-        violations, path_to_modified_lines, always_fail_on=always_fail_on
+        violations=parse_ruff_output(ruff_process_result.stdout),
+        git_modified_lines=changed_lines,
+        always_fail_on=(always_fail_on or []),
     ):
-        logger.info(f"Found {len(filtered_violations)}")
-
+        logger.info(f"Found {len(filtered_violations)} ruff violations")
         for violation in filtered_violations:
             logger.error(violation)
 
@@ -108,10 +107,10 @@ def main(  # noqa: PLR0913
                 print(  # noqa: T201 required for GitHub Annotations
                     violation.to_github_annotation(),
                 )
-        sys.exit(1)
+        raise typer.Exit(1)
 
-    logger.info("No ruff violations found :)")
-    sys.exit(0)
+    logger.info("No ruff violations found ⚡")
+    raise typer.Exit(0)
 
 
 if __name__ == "__main__":

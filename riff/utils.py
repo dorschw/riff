@@ -2,9 +2,11 @@ import json
 import pprint
 from pathlib import Path
 
+import git
+import typer
 from git.repo import Repo
 from loguru import logger
-from unidiff import PatchSet
+from unidiff import PatchedFile, PatchSet
 
 from riff.violation import Violation
 
@@ -60,19 +62,18 @@ def parse_ruff_output(ruff_result_raw: str) -> tuple[Violation, ...]:
         raw_violations = json.loads(ruff_result_raw)
 
     violations = tuple(map(Violation.parse, raw_violations))
-    logger.info(f"Parsed {len(violations)} Ruff violations")
+    logger.debug(f"parsed {len(violations)} ruff violations")
     return violations
 
 
-def git_changed_lines(
-    repo_path: Path,
+def parse_git_changed_lines(
     base_branch: str,
 ) -> dict[Path, set[int]]:
     """Returns
     Dict[Path, Tuple[int]]: maps modified files, to the indices of the lines changed.
     """
-
-    def parse_modified_lines(patched_file: PatchSet) -> set[int]:
+    3
+    def parse_modified_lines(patched_file: PatchedFile) -> set[int]:
         return {
             line.source_line_no
             for hunk in patched_file
@@ -80,10 +81,10 @@ def git_changed_lines(
             if line.is_removed and line.value.strip()
         }
 
-    repo = Repo(repo_path, search_parent_directories=True)
+    repo = Repo(search_parent_directories=True)
     result = {
-        Path(patch.path): parse_modified_lines(patch)
-        for patch in PatchSet(
+        Path(patched_file.path): parse_modified_lines(patched_file)
+        for patched_file in PatchSet(
             repo.git.diff(
                 "HEAD",
                 base_branch,
@@ -92,5 +93,19 @@ def git_changed_lines(
             ),
         )
     }
-    logger.debug(f"Modified lines:\n{pprint.pformat(result,compact=True)}")
+    if result:
+        logger.debug(f"modified lines:\n{pprint.pformat(result,compact=True)}")
+    else:
+        repo_path = Path(repo.git_dir).parent.resolve()
+        logger.error(
+            f"could not find any git-modified lines in {repo_path}: Are the files committed?"  # noqa: E501
+        )
     return result
+
+
+def validate_repo_path() -> None:
+    try:
+        git.Repo(search_parent_directories=True)
+    except git.exc.InvalidGitRepositoryError:
+        logger.error(f"Cannot detect repository in {Path().resolve()}")
+        raise typer.Exit(1) from None  # no need for whole stack trace
