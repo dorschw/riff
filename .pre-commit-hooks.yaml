@@ -1,0 +1,6 @@
+- id: riff
+  name: riff
+  description: run ruff, but only fail on code lines modified (based on git diff)
+  entry: riff
+  pass_filenames: true
+  language: python
