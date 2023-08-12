@@ -5,9 +5,9 @@ from pathlib import Path
 import git
 import typer
 from git.repo import Repo
-from loguru import logger
 from unidiff import PatchedFile, PatchSet
 
+from riff.logger import logger
 from riff.violation import Violation
 
 

@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import NoReturn
 
 import typer
-from loguru import logger
 
+from riff.logger import logger
 from riff.utils import (
     parse_git_modified_lines,
     parse_ruff_output,
