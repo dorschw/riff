@@ -10,4 +10,4 @@ jobs:
     - uses: actions/setup-python@v4
     - uses: snok/install-poetry@v1
     - run: poetry install
-    - run: poetry run riff/release/check_ruff_version.py
+    - run: poetry run riff/riff/release/check_ruff_version.py
