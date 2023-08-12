@@ -1,22 +1,18 @@
 
 # Riff
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v1.json)](https://github.com/charliermarsh/ruff)
+[![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 Ruff + diff = Riff
 
 Run [**Ruff**](https://ruff.rs)⚡, and filter out violations not caused by your branch.
-
 Riff uses `git diff` to detect code lines modified in the current branch, and filters Ruff's output accordingly.
-
 Riff only fails when violations are detected in modified lines.
 
 
 ### Rationale
 Ruff doesn't have a baseline feature, so Riff can come handy for enforcing Ruff rules in larger repositories quickly, without having to fix every single existing violation.
 
-## Badges
-
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v1.json)](https://github.com/charliermarsh/ruff)
-[![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 
 ## Usage
 
