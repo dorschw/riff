@@ -11,6 +11,7 @@ def get_latest_ruff_version() -> Version:
 
 def get_latest_tag() -> Version:
     repo = Repo(search_parent_directories=True)
+    logger.info(repo.tags)
     return Version(
         sorted(repo.tags, key=lambda t: t.commit.committed_datetime)[-1].name
     )
