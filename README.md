@@ -31,7 +31,7 @@ Copy this to your [`.pre-commit-config`](https://pre-commit.com/#plugins) file
 - repo: https://github.com/dorschw/riff
   hooks:
   - id: riff
-    rev: 0.0.284a1
+    rev: v0.0.284a1
 ```
 
 To pass other arguments to Riff (and Ruff), add the `args` key, e.g.
