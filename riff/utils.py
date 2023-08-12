@@ -58,6 +58,9 @@ def validate_paths_relative_to_repo(paths: list[Path], repo_path: Path) -> None:
 
 
 def parse_ruff_output(ruff_result_raw: str) -> tuple[Violation, ...]:
+    if not ruff_result_raw:
+        return ()
+
     with logger.catch(json.JSONDecodeError, reraise=True):
         raw_violations = json.loads(ruff_result_raw)
 
@@ -72,7 +75,6 @@ def parse_git_changed_lines(
     """Returns
     Dict[Path, Tuple[int]]: maps modified files, to the indices of the lines changed.
     """
-    3
     def parse_modified_lines(patched_file: PatchedFile) -> set[int]:
         return {
             line.target_line_no

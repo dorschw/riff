@@ -21,7 +21,8 @@ class LinterErrorsFoundError(Exception):
 
 
 def run_ruff(
-    paths: list[Path], additional_ruff_args: str
+    paths: list[Path],
+    ruff_args: list[str],
 ) -> subprocess.CompletedProcess:
     """
     Runs ruff with the given paths and extra arguments.
@@ -37,8 +38,8 @@ def run_ruff(
         (
             "ruff",
             *map(str, paths),
+            *ruff_args,
             "--format=json",
-            additional_ruff_args,
         )
     ).rstrip()
     logger.debug(f"running '{ruff_command}'")
@@ -80,19 +81,25 @@ def filter_violations(
     )
 
 
-@app.command()
+@app.command(
+    context_settings={
+        "allow_extra_args": True,
+        "ignore_unknown_options": True,
+    }  # noqa: E501
+)
 def main(
-    paths: list[Path],
+    # typer doesn't support `| None`
+    context: typer.Context,  # ruff args
+    paths: list[Path] = None,  # type:ignore[assignment] # noqa: RUF013
+    always_fail_on: list[str] = None,  # type:ignore[assignment] # noqa: RUF013
     print_github_annotation: bool = False,
-    ruff_args: str = "",
-    always_fail_on: list[str] = None,  # noqa:RUF013
     base_branch: str = "origin/main",
 ) -> NoReturn:
     validate_repo_path()  # raises if a repo isn't found at cwd or above
     if not (changed_lines := parse_git_changed_lines(base_branch)):
         raise typer.Exit(1)
 
-    ruff_process_result = run_ruff(paths, ruff_args)
+    ruff_process_result = run_ruff(paths or [Path()], context.args)
 
     if filtered_violations := filter_violations(
         violations=parse_ruff_output(ruff_process_result.stdout),
