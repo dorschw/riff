@@ -1,6 +1,13 @@
+import os
+
 import requests  # type:ignore[import]
 from loguru import logger  # noqa: TID251
 from packaging.version import Version
+
+
+def set_output(key: str, value: str) -> None:
+    with open(os.environ["GITHUB_OUTPUT"], "a") as fh:  # noqa: PTH123
+        print(f"{key}={value}", file=fh)
 
 
 def get_latest_version(project: str) -> Version:
@@ -14,6 +21,4 @@ riff_version = get_latest_version("riff")
 logger.info(f"{ruff_version=}")
 logger.info(f"{riff_version=}")
 
-print(  # noqa: T201
-    f"newer_ruff_version={ruff_version > Version(riff_version.base_version)}"
-)
+set_output("newer_ruff_version", str(ruff_version > Version(riff_version.base_version)))
