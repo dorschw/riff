@@ -1,6 +1,7 @@
-name: Update Ruff version
+name: Sync Ruff version
 on:
-  push:
+  # push:
+  workflow_dispatch:
 
 jobs:
   sync-ruff:
@@ -10,5 +11,4 @@ jobs:
     - uses: actions/setup-python@v4
     - uses: snok/install-poetry@v1
     - run: poetry install
-    - run: poetry run python riff/release/check_ruff_version.py
-    - run: echo ${{steps.sync-ruff.outputs.newer_ruff_version}}
+    - run: poetry run python riff/release/sync_ruff_version.py
