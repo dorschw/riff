@@ -6,6 +6,11 @@ authors = ["dorschw <81086590+dorschw@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"
 
+[tool.poetry.urls]
+"Homepage" = "https://github.com/dorschw/riff"
+"Source" = "https://github.com/dorschw/riff"
+"Bug Tracker" = "https://github.com/dorschw/riff/issues"
+
 [tool.poetry.dependencies]
 python = "^3.10"
 ruff = "==0.0.284"
