@@ -121,7 +121,7 @@ def filter_violations(
         "ignore_unknown_options": True,
     }
 )
-def main(  # dead: disable
+def main(
     # typer doesn't support `| None`
     context: typer.Context,  # ruff args
     always_fail_on: list[str] = None,  # type:ignore[assignment] # noqa: RUF013
