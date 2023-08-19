@@ -7,9 +7,14 @@ license = "MIT"
 readme = "README.md"
 exclude = ["riff/release", "riff/tests"]
 
+[tool.poetry.urls]
+"Homepage" = "https://github.com/dorschw/riff"
+"Source" = "https://github.com/dorschw/riff"
+"Bug Tracker" = "https://github.com/dorschw/riff/issues"
+
 [tool.poetry.dependencies]
 python = "^3.10"
-ruff = "==0.0.284"
+ruff = "==0.0.285"
 typer = ">=0.7.0"
 unidiff = "^0.7.5"
 loguru = "^0.7.0"
@@ -22,8 +27,6 @@ black = "^23.7.0"
 pytest = "^7.4.0"
 ipykernel = "^6.25.1"
 requests = "^2.31.0"
-types-requests = "^2.31.0.2"
-types-toml = "^0.10.8.7"
 
 [tool.poetry.scripts]
 riff = "riff.riff:app"
