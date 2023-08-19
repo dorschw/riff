@@ -60,7 +60,7 @@ def main() -> None:
     logger.debug(f"{riff_version=}")
     logger.debug(f"{ruff_depencency_version=}")
 
-    if ruff_depencency_version > riff_version.base_version:
+    if ruff_depencency_version > Version(riff_version.base_version):
         logger.info("ruff dependency is newer, releasing a new Riff version")
         release(
             current_version=riff_version,
