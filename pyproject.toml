@@ -5,6 +5,7 @@ description = "Run ruff, but only fail on modified lines."
 authors = ["dorschw <81086590+dorschw@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"
+exclude = ["riff/release", "riff/tests"]
 
 [tool.poetry.urls]
 "Homepage" = "https://github.com/dorschw/riff"
@@ -46,6 +47,8 @@ ignore = [
     "S101",
     "INP001",
     "E501",
+    "W293",
+    "ANN101",
 ]
 target-version = "py310"
 line-length = 88
