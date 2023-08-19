@@ -26,6 +26,7 @@ repos:
     rev: v1.5.0
     hooks:
       - id: mypy
+        additional_dependencies: ["types-toml"]
 
   - repo: https://gitlab.com/smop/pre-commit-hooks
     rev: v1.0.0

@@ -5,6 +5,7 @@ description = "Run ruff, but only fail on modified lines."
 authors = ["dorschw <81086590+dorschw@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"
+exclude = ["riff/release", "riff/tests"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -22,6 +23,7 @@ pytest = "^7.4.0"
 ipykernel = "^6.25.1"
 requests = "^2.31.0"
 types-requests = "^2.31.0.2"
+types-toml = "^0.10.8.7"
 
 [tool.poetry.scripts]
 riff = "riff.riff:app"
@@ -43,6 +45,7 @@ ignore = [
     "INP001",
     "E501",
     "W293",
+    "ANN101",
 ]
 target-version = "py310"
 line-length = 88
