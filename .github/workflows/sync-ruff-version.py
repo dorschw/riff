@@ -11,12 +11,11 @@ repo = Repo(search_parent_directories=True)
 
 
 def release(
-    current_version: Version, target_version: Version, prerelease: bool
+    current_version: Version,
+    target_version: Version,
 ) -> None:
     current_version_str = str(current_version)
-
-    suffix = "a1" if prerelease else ""
-    target_version_str = f"{target_version!s}{suffix}"
+    target_version_str = f"{target_version!s}.0"
 
     if current_version_str not in (readme := README_PATH.read_text()):
         raise RuntimeError(f"can't find {current_version_str} in README.md")
@@ -66,7 +65,6 @@ def main() -> None:
         release(
             current_version=riff_version,
             target_version=ruff_depencency_version,
-            prerelease=True,
         )
     else:
         logger.info("Ruff dependency is not newer than Riff, exiting")
