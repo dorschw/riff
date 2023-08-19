@@ -1,10 +1,13 @@
 name: Sync Ruff version
 on:
-  # push:
-  workflow_dispatch:
+  push:
+    branches:
+    - "main"
 
 jobs:
   sync-ruff:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -12,3 +15,4 @@ jobs:
     - uses: snok/install-poetry@v1
     - run: poetry install
     - run: poetry run python .github/workflows/sync-ruff-version.py
+    - uses: stefanzweifel/git-auto-commit-action@v4
