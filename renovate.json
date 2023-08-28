@@ -14,7 +14,7 @@
     },
     {
       "matchUpdateTypes": ["minor"],
-      "schedule": ["every sunday at noon"]
+      "schedule": ["every sunday at noon"],
       "automerge": true
     },
     {
