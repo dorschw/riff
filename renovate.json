@@ -13,8 +13,13 @@
       "automerge": true
     },
     {
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchUpdateTypes": ["minor"],
+      "schedule": ["every sunday at noon"]
       "automerge": true
+    },
+    {
+      "matchUpdateTypes": ["patch"],
+      "schedule": ["noon of the first day of the month"]
     }
   ]
 }
