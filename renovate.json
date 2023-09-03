@@ -15,6 +15,6 @@
     {
       "matchUpdateTypes": ["minor"],
       "automerge": true
-    },
+    }
   ]
 }
