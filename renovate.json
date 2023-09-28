@@ -11,10 +11,6 @@
       "matchPackagePatterns": ["ruff", "charliermarsh/ruff-pre-commit"],
       "groupName": "ruff",
       "automerge": true
-    },
-    {
-      "matchUpdateTypes": ["minor"],
-      "automerge": true
     }
   ]
 }
