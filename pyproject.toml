@@ -14,7 +14,7 @@ exclude = ["riff/release", "riff/tests"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-ruff = "==0.0.291"
+ruff = "==0.0.292"
 typer = ">=0.7.0"
 unidiff = "^0.7.5"
 loguru = "^0.7.0"
