@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "riff"
-version = "0.0.292.0"
+version = "0.0.287.0"
 description = "Run ruff, but only fail on modified lines."
 authors = ["dorschw <81086590+dorschw@users.noreply.github.com>"]
 license = "MIT"
@@ -14,7 +14,7 @@ exclude = ["riff/release", "riff/tests"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-ruff = "==0.0.292"
+ruff = "==0.0.287"
 typer = ">=0.7.0"
 unidiff = "^0.7.5"
 loguru = "^0.7.0"
