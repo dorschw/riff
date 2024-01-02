@@ -15,4 +15,4 @@ jobs:
     - uses: snok/install-poetry@v1
     - run: poetry install
     - run: poetry run python .github/workflows/sync-ruff-version.py
-    - uses: stefanzweifel/git-auto-commit-action@v4
+    - uses: stefanzweifel/git-auto-commit-action@v5
