@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "riff"
-version = "0.0.292.0"
+version = "0.1.9.0"
 description = "Run ruff, but only fail on modified lines."
 authors = ["dorschw <81086590+dorschw@users.noreply.github.com>"]
 license = "MIT"
