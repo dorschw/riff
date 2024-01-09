@@ -49,29 +49,25 @@ def run_ruff(
     if not ruff_args:
         ruff_args = ["."]
     elif "--format" in ruff_args:
-        logger.error("the `--format` argument is not (yet) supported")
+        logger.error("riff does not (yet) support the `--format` argument")
         raise ArgumentNotSupportedError
 
     ruff_command = " ".join(
         (
             "ruff",
             *ruff_args,
-            "--format=json",
+            "--output-format=json",
         )
-    ).rstrip()
+    )
     logger.debug(f"running '{ruff_command}'")
 
-    process = subprocess.run(
+    return subprocess.run(
         ruff_command,
         shell=True,  # noqa: S602
         capture_output=True,
         text=True,
         check=False,
     )
-    if process.returncode not in (0, 1, 2, 127):
-        logger.info(f"ruff exit code:{process.returncode}")
-
-    return process
 
 
 def filter_violations(
@@ -79,7 +75,7 @@ def filter_violations(
     git_modified_lines: dict[Path, set[int]],
     always_fail_on: Iterable[str] | None,
 ) -> tuple[Violation, ...]:
-    always_fail_on = set(always_fail_on) if always_fail_on else set()
+    always_fail_on = set(always_fail_on or ())
     """
     Filters a collection of violations based on certain criteria.
 
@@ -115,6 +111,15 @@ def filter_violations(
     )
 
 
+def validate_ruff_exists() -> None:
+    try:
+        subprocess.run(["ruff", "--version"], check=True)  # noqa: S603, S607
+
+    except FileNotFoundError as e:
+        logger.exception("Make sure ruff is installed")
+        raise typer.Exit(1) from e
+
+
 @app.command(
     context_settings={
         "allow_extra_args": True,
@@ -129,6 +134,8 @@ def main(
     base_branch: str = "origin/main",
 ) -> NoReturn:
     validate_repo_path()  # raises if a repo isn't found at cwd or above
+    validate_ruff_exists()
+
     if not (modified_lines := parse_git_modified_lines(base_branch)):
         raise typer.Exit(1)
 
@@ -140,7 +147,7 @@ def main(
     if filtered_violations := filter_violations(
         violations=parse_ruff_output(ruff_process_result.stdout),
         git_modified_lines=modified_lines,
-        always_fail_on=(always_fail_on or []),
+        always_fail_on=always_fail_on,
     ):
         logger.info(f"Found {len(filtered_violations)} ruff violations")
         for violation in filtered_violations:
