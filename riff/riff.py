@@ -130,7 +130,7 @@ def main(
 ) -> NoReturn:
     validate_repo_path()  # raises if a repo isn't found at cwd or above
     if not (modified_lines := parse_git_modified_lines(base_branch)):
-        raise typer.Exit(1)
+        raise typer.Exit(0)
 
     try:
         ruff_process_result = run_ruff(context.args)
