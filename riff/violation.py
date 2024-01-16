@@ -31,12 +31,10 @@ class Violation(NamedTuple):
     column_end: int | None = None
 
     def to_github_annotation(self: "Violation") -> str:
-        endline = self.line_end if self.line_end is not None else self.line_start
-        suffix = f"\n{self.fix_suggestion}" if self.fix_suggestion else ""
-        return f"::error file={self.path},line={self.line_start},endline={endline},title={self.linter_name}:{self.error_code}{suffix}".replace(
-            "\n",
-            "%0A",  # GitHub annotations syntax
-        )
+        relativized_path = self.path.relative_to(Path.cwd())
+        first_part = f"::error title=Ruff ({self.error_code}),file={self.path},line={self.line_start},col={self.column_start},endLine={self.line_end},endColumn={self.column_end}::"
+        second_part = f"{relativized_path}:{self.line_start}:{self.column_start}: {self.error_code} {self.message}"
+        return first_part + second_part
 
     @staticmethod
     def parse(raw: dict) -> "Violation":

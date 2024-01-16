@@ -40,7 +40,7 @@ def run_ruff(
             - stdout: The standard output (stdout) of the 'ruff' command as a string.
             - stderr: The standard error (stderr) of the 'ruff' command as a string.
     Raises:
-        ArgumentNotSupportedError: Raised if the `--format` argument is included in ruff_args.
+        ArgumentNotSupportedError: Raised if the `--output-format` argument is included in ruff_args.
 
     Note:
         If the `ruff` command exits with a non-zero status code, the returncode attribute
@@ -48,8 +48,8 @@ def run_ruff(
     """
     if not ruff_args:
         ruff_args = ["."]
-    elif "--format" in ruff_args:
-        logger.error("riff does not (yet) support the `--format` argument")
+    elif "--output-format" in ruff_args:
+        logger.error("the `--output-format` argument is not (yet) supported")
         raise ArgumentNotSupportedError
 
     ruff_command = " ".join(
@@ -137,7 +137,7 @@ def main(
     validate_ruff_exists()
 
     if not (modified_lines := parse_git_modified_lines(base_branch)):
-        raise typer.Exit(1)
+        raise typer.Exit(0)
 
     try:
         ruff_process_result = run_ruff(context.args)

@@ -82,7 +82,7 @@ def parse_git_modified_lines(
             )
         )
     else:
-        logger.error(
+        logger.warning(
             f"could not find any git-modified lines in {repo_root}: Are the files committed?"
         )
     return result
