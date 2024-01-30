@@ -119,6 +119,7 @@ def validate_ruff_installation() -> None:
             ["ruff", "--version"],  # noqa: S603, S607
             check=True,
             text=True,
+            capture_output=True,
         )
         logger.info(f"{ruff_version_process=!r}")
     except FileNotFoundError as e:
