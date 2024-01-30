@@ -45,9 +45,3 @@ repos:
     rev: v1.5.2
     hooks:
       - id: dead
-
-  - repo: https://github.com/dorschw/riff
-    rev: decouple
-    hooks:
-      - id: riff
-        additional_dependencies: ["ruff>=0.0.291"]
