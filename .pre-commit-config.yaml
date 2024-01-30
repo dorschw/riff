@@ -50,4 +50,4 @@ repos:
     rev: decouple
     hooks:
       - id: riff
-        additional_dependencies: ["ruff>=0.291"]
+        additional_dependencies: ["ruff>=0.0.291"]
