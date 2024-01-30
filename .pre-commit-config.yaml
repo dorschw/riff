@@ -45,3 +45,7 @@ repos:
     rev: v1.5.2
     hooks:
       - id: dead
+
+  - id: riff
+    rev: decouple
+    additional_dependencies: ["ruff == *"]
