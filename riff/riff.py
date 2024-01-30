@@ -127,7 +127,8 @@ def validate_ruff_installation() -> None:
         raise typer.Exit(1) from e
 
     if version < Version("0.0.291"):
-        raise ValueError(f"Found Ruff {version}, but 0.0.291 or newer is required.")
+        logger.error(f"Found Ruff {version}, but 0.0.291 or newer is required.")
+        typer.Exit(1)
 
 @app.command(
     context_settings={
