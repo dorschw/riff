@@ -1,5 +1,5 @@
 import subprocess
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from pathlib import Path
 from typing import NoReturn
 
@@ -21,7 +21,7 @@ class ArgumentNotSupportedError(Exception):
 
 
 def run_ruff(
-    ruff_args: list[str],
+    ruff_args: Sequence[str],
 ) -> subprocess.CompletedProcess:
     """
     Run Ruff with the given arguments.
@@ -47,7 +47,7 @@ def run_ruff(
         of the returned CompletedProcess object will reflect that status code.
     """
     if not ruff_args:
-        ruff_args = ["."]
+        ruff_args = (".",)
     elif "--output-format" in ruff_args:
         logger.error("the `--output-format` argument is not (yet) supported")
         raise ArgumentNotSupportedError
@@ -58,20 +58,16 @@ def run_ruff(
             *ruff_args,
             "--output-format=json",
         )
-    ).rstrip()
+    )
     logger.debug(f"running '{ruff_command}'")
 
-    process = subprocess.run(
+    return subprocess.run(
         ruff_command,
         shell=True,  # noqa: S602
         capture_output=True,
         text=True,
         check=False,
     )
-    if process.returncode not in (0, 1, 2, 127):
-        logger.info(f"ruff exit code:{process.returncode}")
-
-    return process
 
 
 def filter_violations(
@@ -79,7 +75,7 @@ def filter_violations(
     git_modified_lines: dict[Path, set[int]],
     always_fail_on: Iterable[str] | None,
 ) -> tuple[Violation, ...]:
-    always_fail_on = set(always_fail_on) if always_fail_on else set()
+    always_fail_on = set(always_fail_on or ())
     """
     Filters a collection of violations based on certain criteria.
 
@@ -115,21 +111,54 @@ def filter_violations(
     )
 
 
+def validate_ruff_installation() -> None:
+    """
+    Check whether ruff is installed, and its version is supported.
+    """
+    from packaging.version import InvalidVersion, Version
+
+    try:
+        ruff_version_process = subprocess.run(
+            ["ruff", "--version"],  # noqa: S603, S607
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+    except FileNotFoundError as e:
+        logger.exception("Make sure ruff is installed.")
+        raise typer.Exit(1) from e
+
+    try:
+        version = Version(
+            ruff_version_process.stdout.removeprefix("ruff ").rstrip("\n")
+        )
+        logger.debug(f"ruff {version=!r}")
+    except InvalidVersion as e:
+        logger.error(f"cannot parse version {version}")
+        raise typer.Exit(1) from e
+
+    if version < Version("0.0.291"):  # minimal version with --output-format
+        logger.error(f"Found Ruff {version}, but 0.0.291 or newer is required.")
+        typer.Exit(1)
+
+
 @app.command(
     context_settings={
         "allow_extra_args": True,
         "ignore_unknown_options": True,
     }
 )
-def main(
-    # typer doesn't support `| None`
+def main(  # dead: disable
     context: typer.Context,  # ruff args
-    always_fail_on: list[str] = None,  # type:ignore[assignment] # noqa: RUF013
+    always_fail_on: list[str] = None,  # type:ignore[assignment] # noqa: RUF013  # typer doesn't support `| None`
     print_github_annotation: bool = False,
     base_branch: str = "origin/main",
 ) -> NoReturn:
     validate_repo_path()  # raises if a repo isn't found at cwd or above
+    validate_ruff_installation()  # raises if ruff is not installed/outdated version
+
     if not (modified_lines := parse_git_modified_lines(base_branch)):
+        logger.info("No git-modified lines detected, exiting.")
         raise typer.Exit(0)
 
     try:
@@ -140,7 +169,7 @@ def main(
     if filtered_violations := filter_violations(
         violations=parse_ruff_output(ruff_process_result.stdout),
         git_modified_lines=modified_lines,
-        always_fail_on=(always_fail_on or []),
+        always_fail_on=always_fail_on,
     ):
         logger.info(f"Found {len(filtered_violations)} ruff violations")
         for violation in filtered_violations:
