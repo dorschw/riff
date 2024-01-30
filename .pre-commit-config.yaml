@@ -47,6 +47,7 @@ repos:
       - id: dead
 
   - repo: https://github.com/dorschw/riff
-    id: riff
     rev: decouple
-    additional_dependencies: ["ruff == *"]
+    hooks:
+      - id: riff
+        additional_dependencies: ["ruff == *"]
