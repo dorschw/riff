@@ -1,5 +1,5 @@
 import subprocess
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from pathlib import Path
 from typing import NoReturn
 
@@ -21,7 +21,7 @@ class ArgumentNotSupportedError(Exception):
 
 
 def run_ruff(
-    ruff_args: list[str],
+    ruff_args: Sequence[str],
 ) -> subprocess.CompletedProcess:
     """
     Run Ruff with the given arguments.
@@ -47,7 +47,7 @@ def run_ruff(
         of the returned CompletedProcess object will reflect that status code.
     """
     if not ruff_args:
-        ruff_args = ["."]
+        ruff_args = (".",)
     elif "--output-format" in ruff_args:
         logger.error("the `--output-format` argument is not (yet) supported")
         raise ArgumentNotSupportedError
@@ -112,6 +112,9 @@ def filter_violations(
 
 
 def validate_ruff_installation() -> None:
+    """
+    Check whether ruff is installed, and its version is supported.
+    """
     from packaging.version import InvalidVersion, Version
 
     try:
@@ -129,12 +132,12 @@ def validate_ruff_installation() -> None:
         version = Version(
             ruff_version_process.stdout.removeprefix("ruff ").rstrip("\n")
         )
-        logger.info(f"{version=!r}")
+        logger.debug(f"ruff {version=!r}")
     except InvalidVersion as e:
         logger.error(f"cannot parse version {version}")
         raise typer.Exit(1) from e
 
-    if version < Version("0.0.291"):
+    if version < Version("0.0.291"):  # minimal version with --output-format
         logger.error(f"Found Ruff {version}, but 0.0.291 or newer is required.")
         typer.Exit(1)
 
@@ -146,16 +149,16 @@ def validate_ruff_installation() -> None:
     }
 )
 def main(  # dead: disable
-    # typer doesn't support `| None`
     context: typer.Context,  # ruff args
-    always_fail_on: list[str] = None,  # type:ignore[assignment] # noqa: RUF013
+    always_fail_on: list[str] = None,  # type:ignore[assignment] # noqa: RUF013  # typer doesn't support `| None`
     print_github_annotation: bool = False,
     base_branch: str = "origin/main",
 ) -> NoReturn:
     validate_repo_path()  # raises if a repo isn't found at cwd or above
-    validate_ruff_installation()
+    validate_ruff_installation()  # raises if ruff is not installed/outdated version
 
     if not (modified_lines := parse_git_modified_lines(base_branch)):
+        logger.info("No git-modified lines detected, exiting.")
         raise typer.Exit(0)
 
     try:
