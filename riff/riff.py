@@ -120,6 +120,7 @@ def validate_ruff_installation() -> None:
             check=True,
             text=True,
         )
+        logger.info(f"{ruff_version_process=!r}")
     except FileNotFoundError as e:
         logger.exception("Make sure ruff is installed.")
         raise typer.Exit(1) from e
