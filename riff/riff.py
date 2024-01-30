@@ -113,13 +113,15 @@ def filter_violations(
 
 def validate_ruff_installation() -> None:
     from packaging.version import InvalidVersion, Version
-    
+
     try:
-        ruff_version_process = subprocess.run(["ruff", "--version"], check=True, text=True)  # noqa: S603, S607
+        ruff_version_process = subprocess.run(
+            ["ruff", "--version"], check=True, text=True
+        )  # noqa: S603, S607
     except FileNotFoundError as e:
         logger.exception("Make sure ruff is installed.")
         raise typer.Exit(1) from e
-    
+
     try:
         version = Version(ruff_version_process.stdout.removeprefix("ruff "))
     except InvalidVersion as e:
@@ -129,6 +131,7 @@ def validate_ruff_installation() -> None:
     if version < Version("0.0.291"):
         logger.error(f"Found Ruff {version}, but 0.0.291 or newer is required.")
         typer.Exit(1)
+
 
 @app.command(
     context_settings={
