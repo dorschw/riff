@@ -141,7 +141,7 @@ def validate_ruff_installation() -> None:
         "ignore_unknown_options": True,
     }
 )
-def main(
+def main( # dead: disable
     # typer doesn't support `| None`
     context: typer.Context,  # ruff args
     always_fail_on: list[str] = None,  # type:ignore[assignment] # noqa: RUF013
