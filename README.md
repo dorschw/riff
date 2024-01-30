@@ -19,8 +19,9 @@ Ruff doesn't have a baseline feature, so Riff can come handy for enforcing Ruff 
 
 ## Usage
 
-### Locally
-* Run `riff`, followed by Riff arguments (optional, see below), and Ruff arguments (optional, see limitations).
+### As a CLI tool
+* Make sure Ruff (>=0.0.291) is installed 
+* Run `riff`, followed by (optional) Riff arguments, and (optional) Ruff arguments.
 * Running `riff` without arguments will run it in the current directory.
 * Riff expects to be run in a repository folder.
 
@@ -33,7 +34,7 @@ Copy this to your [`.pre-commit-config`](https://pre-commit.com/#plugins) file
   hooks:
   - id: riff
     rev: v0.1.9.0
-    additional_dependencies: ["ruff>=0.0.291"]
+    additional_dependencies: ["ruff>=0.0.291"] # minimal is 0.0.291
 ```
 
 To pass other arguments to Riff (and Ruff), add the `args` key, e.g.
@@ -41,10 +42,11 @@ To pass other arguments to Riff (and Ruff), add the `args` key, e.g.
     args: ["--base-branch=origin/master"]
 ```
 
-### Arguments
+### Riff Arguments
 * `always_fail_on`: comma-separated list of Ruff error codes. When detected by Ruff, Riff will consider them as failures, even if they're not in lines modified in the current branch.
 * `print_github_annotation`: boolean (default `false`). When set to `true`, will add [GitHub Annotations](https://dailystuff.nl/blog/2023/extending-github-actions-with-annotations), making the violations more visible when reviewing code in GitHub's `Modified Files` tab.
 * `base_branch`: string (default `origin/main`). Change to `origin/master` or whatever your base branch is named.
+
 ## Limitations
 * When using Ruff's `--fix` feature, Ruff will fix everything it is [configured](https://beta.ruff.rs/docs/configuration/) to, regardless of the modified lines. Riff cannot control this behavior.
-* Riff cannot _currently_ run Ruff with a `--format` configuration. (see [here](https://github.com/dorschw/riff/issues/9))
+* Riff cannot _currently_ run Ruff with a `--output-format` configuration. (see [here](https://github.com/dorschw/riff/issues/9))
