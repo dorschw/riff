@@ -33,7 +33,7 @@ Copy this to your [`.pre-commit-config`](https://pre-commit.com/#plugins) file
   hooks:
   - id: riff
     rev: v0.1.9.0
-    additional_dependencies: ["ruff == v0.1.11"]
+    additional_dependencies: ["ruff == *"]
 ```
 
 To pass other arguments to Riff (and Ruff), add the `args` key, e.g.
