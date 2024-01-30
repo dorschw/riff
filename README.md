@@ -20,7 +20,7 @@ Ruff doesn't have a baseline feature, so Riff can come handy for enforcing Ruff 
 ## Usage
 
 ### As a CLI tool
-* Make sure Ruff (>=0.0.291) is installed 
+* Make sure Ruff (>=0.0.291) is installed
 * Run `riff`, followed by (optional) Riff arguments, and (optional) Ruff arguments.
 * Running `riff` without arguments will run it in the current directory.
 * Riff expects to be run in a repository folder.
