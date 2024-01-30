@@ -18,6 +18,7 @@ typer = ">=0.7.0"
 unidiff = "^0.7.5"
 loguru = "^0.7.0"
 gitpython = "^3.1.27"
+packaging = "^23.2"
 
 
 [tool.poetry.group.dev.dependencies]
