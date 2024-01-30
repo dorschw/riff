@@ -121,13 +121,13 @@ def validate_ruff_installation() -> None:
             text=True,
             capture_output=True,
         )
-        logger.info(f"{ruff_version_process=!r}")
     except FileNotFoundError as e:
         logger.exception("Make sure ruff is installed.")
         raise typer.Exit(1) from e
 
     try:
-        version = Version(ruff_version_process.stdout.removeprefix("ruff "))
+        version = Version(ruff_version_process.stdout.removeprefix("ruff ").rstrip("\n"))
+        logger.info(f"{version=!r}")
     except InvalidVersion as e:
         logger.error(f"cannot parse version {version}")
         raise typer.Exit(1) from e
