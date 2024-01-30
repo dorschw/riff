@@ -115,11 +115,11 @@ def validate_ruff_installation() -> None:
     from packaging.version import InvalidVersion, Version
 
     try:
-        ruff_version_process = subprocess.run( 
+        ruff_version_process = subprocess.run(
             ["ruff", "--version"],  # noqa: S603, S607
             check=True,
             text=True,
-         )
+        )
     except FileNotFoundError as e:
         logger.exception("Make sure ruff is installed.")
         raise typer.Exit(1) from e
