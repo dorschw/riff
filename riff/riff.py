@@ -111,14 +111,23 @@ def filter_violations(
     )
 
 
-def validate_ruff_exists() -> None:
+def validate_ruff_installation() -> None:
+    from packaging.version import InvalidVersion, Version
+    
     try:
-        subprocess.run(["ruff", "--version"], check=True)  # noqa: S603, S607
-
+        ruff_version_process = subprocess.run(["ruff", "--version"], check=True, text=True)  # noqa: S603, S607
     except FileNotFoundError as e:
-        logger.exception("Make sure ruff is installed")
+        logger.exception("Make sure ruff is installed.")
+        raise typer.Exit(1) from e
+    
+    try:
+        version = Version(ruff_version_process.stdout.removeprefix("ruff "))
+    except InvalidVersion as e:
+        logger.error(f"cannot parse version {version}")
         raise typer.Exit(1) from e
 
+    if version < Version("0.0.291"):
+        raise ValueError(f"Found Ruff {version}, but 0.0.291 or newer is required.")
 
 @app.command(
     context_settings={
@@ -134,7 +143,7 @@ def main(
     base_branch: str = "origin/main",
 ) -> NoReturn:
     validate_repo_path()  # raises if a repo isn't found at cwd or above
-    validate_ruff_exists()
+    validate_ruff_installation()
 
     if not (modified_lines := parse_git_modified_lines(base_branch)):
         raise typer.Exit(0)
