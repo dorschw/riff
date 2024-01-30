@@ -61,7 +61,7 @@ def parse_git_modified_lines(
     repo_root = Path(repo.git_dir).parent
 
     result = {
-        Path(repo_root, patched_file.path): parse_modified_lines(patched_file)
+        (repo_root / patched_file.path): parse_modified_lines(patched_file)
         for patched_file in PatchSet(
             repo.git.diff(
                 base_branch,
