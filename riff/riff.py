@@ -132,13 +132,13 @@ def validate_ruff_installation() -> None:
         version = Version(
             ruff_version_process.stdout.removeprefix("ruff ").rstrip("\n")
         )
-        logger.debug(f"ruff {version=!r}")
+        logger.debug(f"ruff {version=!s}")
     except InvalidVersion as e:
         logger.error(f"cannot parse version {version}")
         raise typer.Exit(1) from e
 
     if version < Version("0.0.291"):  # minimal version with --output-format
-        logger.error(f"Found Ruff {version}, but 0.0.291 or newer is required.")
+        logger.error(f"Found Ruff {version!s}, but 0.0.291 or newer is required.")
         typer.Exit(1)
 
 
@@ -164,25 +164,26 @@ def main(  # dead: disable
     try:
         ruff_process_result = run_ruff(context.args)
     except ArgumentNotSupportedError:
-        raise typer.Exit(1) from None
+        raise typer.Exit(1) from None  # no need for whole stack trace
 
-    if filtered_violations := filter_violations(
-        violations=parse_ruff_output(ruff_process_result.stdout),
-        git_modified_lines=modified_lines,
-        always_fail_on=always_fail_on,
+    if not (
+        filtered_violations := filter_violations(
+            violations=parse_ruff_output(ruff_process_result.stdout),
+            git_modified_lines=modified_lines,
+            always_fail_on=always_fail_on,
+        )
     ):
-        logger.info(f"Found {len(filtered_violations)} ruff violations")
-        for violation in filtered_violations:
-            logger.error(violation)
+        logger.success("No ruff violations found ⚡")
+        raise typer.Exit(0)
 
-            if print_github_annotation:
-                print(  # noqa: T201 required for GitHub Annotations
-                    violation.to_github_annotation(),
-                )
-        raise typer.Exit(1)
-
-    logger.info("No ruff violations found ⚡")
-    raise typer.Exit(0)
+    print(f"Found {len(filtered_violations)} ruff violations:")  # noqa: T201
+    for violation in filtered_violations:
+        logger.error(violation)
+        if print_github_annotation:
+            print(  # noqa: T201
+                violation.to_github_annotation(),
+            )
+    raise typer.Exit(1)
 
 
 if __name__ == "__main__":
