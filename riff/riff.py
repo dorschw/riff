@@ -16,8 +16,7 @@ from riff.violation import Violation
 app = typer.Typer(no_args_is_help=True, invoke_without_command=True)
 
 
-class ArgumentNotSupportedError(Exception):
-    ...
+class ArgumentNotSupportedError(Exception): ...
 
 
 def run_ruff(
@@ -63,7 +62,7 @@ def run_ruff(
 
     return subprocess.run(
         ruff_command,
-        shell=True,  # noqa: S602
+        shell=True,
         capture_output=True,
         text=True,
         check=False,
@@ -119,7 +118,7 @@ def validate_ruff_installation() -> None:
 
     try:
         ruff_version_process = subprocess.run(
-            ["ruff", "--version"],  # noqa: S603, S607
+            ["ruff", "--version"],  # noqa: S607
             check=True,
             text=True,
             capture_output=True,
