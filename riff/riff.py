@@ -60,7 +60,7 @@ def run_ruff(
     )
     logger.debug(f"running '{ruff_command}'")
 
-    return subprocess.run(
+    return subprocess.run(  # noqa: S602
         ruff_command,
         shell=True,
         capture_output=True,
@@ -117,7 +117,7 @@ def validate_ruff_installation() -> None:
     from packaging.version import InvalidVersion, Version
 
     try:
-        ruff_version_process = subprocess.run(
+        ruff_version_process = subprocess.run(  # noqa: S603
             ["ruff", "--version"],  # noqa: S607
             check=True,
             text=True,
