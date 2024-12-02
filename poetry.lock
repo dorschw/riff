@@ -1169,6 +1169,28 @@ shellingham = ">=1.3.0"
 typing-extensions = ">=3.7.4.3"
 
 [[package]]
+name = "types-toml"
+version = "0.10.8.20240310"
+description = "Typing stubs for toml"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-toml-0.10.8.20240310.tar.gz", hash = "sha256:3d41501302972436a6b8b239c850b26689657e25281b48ff0ec06345b8830331"},
+    {file = "types_toml-0.10.8.20240310-py3-none-any.whl", hash = "sha256:627b47775d25fa29977d9c70dc0cbab3f314f32c8d8d0c012f2ef5de7aaec05d"},
+]
+
+[[package]]
+name = "types-unidiff"
+version = "0.7.0.20240505"
+description = "Typing stubs for unidiff"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-unidiff-0.7.0.20240505.tar.gz", hash = "sha256:cf15201c7af233f8380f1a289d169e1f740a67369ff60ab7bd0a131402b33194"},
+    {file = "types_unidiff-0.7.0.20240505-py3-none-any.whl", hash = "sha256:f01ac7bf7fe4094b3c97c8f08125278ea71455c18d984a980569aef2ab6a768b"},
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.12.2"
 description = "Backported and Experimental Type Hints for Python 3.8+"
@@ -1238,4 +1260,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "b7725fd12b02dce5ffbe312dec0cd8db802a761b828858e04b38f0f6e99309df"
+content-hash = "693c098e29582e1eb716a84d8e0b1dfd5a5747a161835a4091159058bfaeb4b4"
