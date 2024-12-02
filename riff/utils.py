@@ -106,5 +106,5 @@ def validate_repo_path() -> Path:
     try:
         return Path(git.Repo(search_parent_directories=True).git_dir).parent.resolve()
     except git.exc.InvalidGitRepositoryError:
-        logger.error(f"Cannot detect repository in {Path().resolve()}")
+        logger.error(f"Cannot detect repository in {Path.cwd()}")
         raise typer.Exit(1) from None  # no need for whole stack trace
