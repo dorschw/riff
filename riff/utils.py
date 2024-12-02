@@ -54,7 +54,7 @@ def parse_git_modified_lines(
             line.target_line_no
             for hunk in patched_file
             for line in hunk
-            if line.is_added and line.value.strip()
+            if line.is_added and line.value.strip() and line.target_line_no is not None
         }
 
     repo = Repo(search_parent_directories=True)
