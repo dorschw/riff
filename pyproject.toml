@@ -41,9 +41,8 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
-select = ["ALL"]
-ignore = [
-    "ANN101",
+lint.select = ["ALL"]
+lint.ignore = [
     "COM812",
     "D",
     "E501",
@@ -59,5 +58,5 @@ ignore = [
 target-version = "py310"
 line-length = 88
 
-[tool.ruff.flake8-tidy-imports.banned-api]
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
 "loguru".msg = "use riff.logger instead"
