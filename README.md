@@ -43,9 +43,9 @@ To pass other arguments to Riff (and Ruff), add the `args` key, e.g.
 ```
 
 ### Riff Arguments
-* `always_fail_on`: comma-separated list of Ruff error codes. When detected by Ruff, Riff will consider them as failures, even if they're not in lines modified in the current branch.
-* `print_github_annotation`: boolean (default `false`). When set to `true`, will add [GitHub Annotations](https://dailystuff.nl/blog/2023/extending-github-actions-with-annotations), making the violations more visible when reviewing code in GitHub's `Modified Files` tab.
-* `base_branch`: string (default `origin/main`). Change to `origin/master` or whatever your base branch is named.
+* `always-fail-on`: comma-separated list of Ruff error codes. When detected by Ruff, Riff will consider them as failures, even if they're not in lines modified in the current branch.
+* `print-github-annotation`: boolean (default `false`). When set to `true`, will add [GitHub Annotations](https://dailystuff.nl/blog/2023/extending-github-actions-with-annotations), making the violations more visible when reviewing code in GitHub's `Modified Files` tab.
+* `base-branch`: string (default `origin/main`). Change to `origin/master` or whatever your base branch is named.
 
 ## Limitations
 * When using Ruff's `--fix` feature, Ruff will fix everything it is [configured](https://beta.ruff.rs/docs/configuration/) to, regardless of the modified lines. Riff cannot control this behavior.
