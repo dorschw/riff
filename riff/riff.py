@@ -20,7 +20,7 @@ app = typer.Typer(no_args_is_help=True, invoke_without_command=True)
 class ArgumentNotSupportedError(Exception): ...
 
 
-def run_ruff(ruff_args: Sequence[str]) -> subprocess.CompletedProcess:
+def run_ruff(ruff_args: list[str]) -> subprocess.CompletedProcess:
     """
     Run Ruff with the given arguments.
 
@@ -45,10 +45,14 @@ def run_ruff(ruff_args: Sequence[str]) -> subprocess.CompletedProcess:
         of the returned CompletedProcess object will reflect that status code.
     """
     if not ruff_args:
-        ruff_args = (".",)
+        logger.debug("No ruff arguments provided, using default: '.'")
+        ruff_args = ["."]
     elif "--output-format" in ruff_args:
         logger.error("the `--output-format` argument is not (yet) supported")
         raise ArgumentNotSupportedError
+    elif "check" in ruff_args:
+        logger.debug("Removing 'check' from ruff_args, it will be added later")
+        ruff_args.remove("check")
 
     ruff_command = " ".join(
         (
