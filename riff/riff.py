@@ -1,5 +1,5 @@
 import subprocess
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable
 from pathlib import Path
 from typing import NoReturn
 
