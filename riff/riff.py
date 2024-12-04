@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import NoReturn
 
 import typer
+from packaging.version import InvalidVersion, Version
 
 from riff.logger import logger
 from riff.utils import (
@@ -19,9 +20,7 @@ app = typer.Typer(no_args_is_help=True, invoke_without_command=True)
 class ArgumentNotSupportedError(Exception): ...
 
 
-def run_ruff(
-    ruff_args: Sequence[str],
-) -> subprocess.CompletedProcess:
+def run_ruff(ruff_args: Sequence[str]) -> subprocess.CompletedProcess:
     """
     Run Ruff with the given arguments.
 
@@ -54,6 +53,7 @@ def run_ruff(
     ruff_command = " ".join(
         (
             "ruff",
+            "check",
             *ruff_args,
             "--output-format=json",
         )
@@ -114,7 +114,6 @@ def validate_ruff_installation() -> None:
     """
     Check whether ruff is installed, and its version is supported.
     """
-    from packaging.version import InvalidVersion, Version
 
     try:
         ruff_version_process = subprocess.run(  # noqa: S603
@@ -164,6 +163,10 @@ def main(  # dead: disable
         ruff_process_result = run_ruff(context.args)
     except ArgumentNotSupportedError:
         raise typer.Exit(1) from None  # no need for whole stack trace
+    if ruff_process_result.stderr:
+        raise RuntimeError(
+            f"Ruff failed running, stderr:\n{ruff_process_result.stderr}"
+        )
 
     if not (
         filtered_violations := filter_violations(
