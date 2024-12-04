@@ -11,12 +11,21 @@ from riff.logger import logger
 from riff.violation import Violation
 
 
-def parse_ruff_output(ruff_result_raw: str) -> tuple[Violation, ...]:
-    if not ruff_result_raw:
+def parse_ruff_output(ruff_stdout: str) -> tuple[Violation, ...]:
+    """
+    This method assumes stderr was empty
+    """
+    logger.debug(f"{ruff_stdout=}")
+
+    if not ruff_stdout:
+        logger.debug("No ruff output, assuming no violations")
         return ()
 
-    with logger.catch(json.JSONDecodeError, reraise=True):
-        raw_violations = json.loads(ruff_result_raw)
+    try:
+        raw_violations = json.loads(ruff_stdout)
+    except json.JSONDecodeError:
+        logger.exception("Could not parse Ruff output as JSON")
+        raise
 
     violations = tuple(map(Violation.parse, raw_violations))
     logger.debug(f"parsed {len(violations)} ruff violations")
