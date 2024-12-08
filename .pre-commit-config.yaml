@@ -36,7 +36,7 @@ repos:
       - id: validate-pyproject
         stages: [push]
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 39.49.3
+    rev: 39.57.4
     hooks:
       - id: renovate-config-validator
         stages: [push]
