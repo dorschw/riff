@@ -179,7 +179,7 @@ def main(  # dead: disable
     for violation in filtered_violations:
         logger.error(violation)
         if print_github_annotation:
-            print(violation.to_github_annotation) # noqa: T201
+            print(violation.github_annotation)  # noqa: T201
     raise typer.Exit(1)
 
 

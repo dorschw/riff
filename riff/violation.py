@@ -31,7 +31,7 @@ class Violation(NamedTuple):
     column_end: int | None = None
 
     @property
-    def to_github_annotation(self: "Violation") -> str:
+    def github_annotation(self: "Violation") -> str:
         relative_path = self.path.relative_to(Path.cwd())
         annotation_parts = [f'::error file={relative_path}', f'line={self.line_start}']
         
@@ -44,7 +44,7 @@ class Violation(NamedTuple):
         if self.column_end:
             annotation_parts.append(f'endColumn={self.column_end}')
 
-        ','.join(annotation_parts) + '::"Ruff ({self.error_code})"'
+        return ','.join(annotation_parts) + f'::"Ruff ({self.error_code})"'
 
     @staticmethod
     def parse(raw: dict) -> "Violation":
