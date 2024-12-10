@@ -1,16 +1,24 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:recommended"
   ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  },
   "pre-commit": {
-    "enabled": true
+    "enabled": true,
+    "automerge": true
   },
   "packageRules": [
     {
-      "matchPackagePatterns": ["ruff", "charliermarsh/ruff-pre-commit"],
       "groupName": "ruff",
-      "automerge": true
+      "automerge": true,
+      "matchPackageNames": [
+        "/ruff/",
+        "/charliermarsh/ruff-pre-commit/"
+      ]
     }
   ]
 }
