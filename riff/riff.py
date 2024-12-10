@@ -168,9 +168,8 @@ def main(  # dead: disable
     except ArgumentNotSupportedError:
         raise typer.Exit(1) from None  # no need for whole stack trace
     if ruff_process_result.stderr:
-        raise RuntimeError(
-            f"Ruff failed running, stderr:\n{ruff_process_result.stderr}"
-        )
+        logger.error(f"Ruff failed running, stderr:\n{ruff_process_result.stderr}")
+        raise typer.Exit(1)
 
     if not (
         filtered_violations := filter_violations(
