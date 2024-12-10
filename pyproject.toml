@@ -55,6 +55,7 @@ lint.ignore = [
     "TRY003",
     "TD",
     "W293",
+    "EM101",
 ]
 target-version = "py310"
 line-length = 88
