@@ -108,3 +108,19 @@ def validate_repo_path() -> Path:
     except git.exc.InvalidGitRepositoryError:
         logger.error(f"Cannot detect repository in {Path.cwd()}")
         raise typer.Exit(1) from None  # no need for whole stack trace
+
+
+def detect_base_branch(repo: Repo) -> str | None:
+    all_branch_names = [branch.name for branch in repo.branches]
+    match len(result := {"main", "master"}.intersection(all_branch_names)):
+        case 1:
+            return result
+        case 2:
+            error = (
+                "both `main` and `master` branches found, can not tell which to use."
+                "Use --base-branch <the branch to use>."
+            )
+
+        case _:
+            error = "can not detect main/master branch. Use --base-branch <the branch to use>"
+    raise RuntimeError(error)
