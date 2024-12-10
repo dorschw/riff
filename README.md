@@ -31,10 +31,10 @@ Copy this to your [`.pre-commit-config`](https://pre-commit.com/#plugins) file
 ####
 ```
 - repo: https://github.com/dorschw/riff
+  rev: v0.1
   hooks:
   - id: riff
-    rev: v0.1.9.0
-    additional_dependencies: ["ruff>=0.0.291"] # minimal is 0.0.291
+    additional_dependencies: ["ruff>=0.0.291"] # minimal is 0.0.291, consider using the latest version
 ```
 
 To pass other arguments to Riff (and Ruff), add the `args` key, e.g.
