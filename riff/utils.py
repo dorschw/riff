@@ -24,7 +24,7 @@ def parse_ruff_output(ruff_stdout: str) -> tuple[Violation, ...]:
     try:
         raw_violations = json.loads(ruff_stdout)
     except json.JSONDecodeError:
-        logger.error("Could not parse Ruff output as JSON:")
+        logger.error("Could not parse Ruff output as JSON")
         raise
 
     violations = tuple(map(Violation.parse, raw_violations))
