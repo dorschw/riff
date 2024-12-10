@@ -21,12 +21,17 @@ gitpython = "^3.1.27"
 packaging = "^23.2"
 
 
+[tool.poetry.group.dev]
+optional = true
+
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.8.1"
 pre-commit = "^4.0.0"
 pytest = "^8.0.0"
 ipykernel = "^6.25.1"
 toml = "^0.10.2"
+types-unidiff = "^0.7.0.20240505"
+types-toml = "^0.10.8.20240310"
 
 [tool.poetry.scripts]
 riff = "riff.riff:app"
@@ -36,9 +41,8 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
-select = ["ALL"]
-ignore = [
-    "ANN101",
+lint.select = ["ALL"]
+lint.ignore = [
     "COM812",
     "D",
     "E501",
@@ -50,9 +54,10 @@ ignore = [
     "TRY003",
     "TD",
     "W293",
+    "EM101",
 ]
 target-version = "py310"
 line-length = 88
 
-[tool.ruff.flake8-tidy-imports.banned-api]
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
 "loguru".msg = "use riff.logger instead"
