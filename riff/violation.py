@@ -44,7 +44,7 @@ class Violation(NamedTuple):
         if self.column_end:
             annotation_parts.append(f"endColumn={self.column_end}")
 
-        return ",".join(annotation_parts) + f'::"Ruff {self.error_code} ({self.message})"'
+        return ",".join(annotation_parts) + f'::Ruff {self.error_code} ({self.message})'
 
     @staticmethod
     def parse(raw: dict) -> "Violation":
