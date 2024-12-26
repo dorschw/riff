@@ -36,7 +36,7 @@ VIOLATIONS_EXPECTED_ANNOTATIONS = [
             linter_name="Ruff",
             is_autofixable=True,
         ),
-        '::error file=file.py,line=10::Ruff E123 (Indentation error)',
+        '::error file=file.py,line=10::Ruff E123: Indentation error',
         id="Without optional fields",
     ),
 ]
