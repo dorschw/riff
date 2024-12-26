@@ -32,12 +32,12 @@ authors = [{"name"="dorschw", "email"="81086590+dorschw@users.noreply.github.com
 license = "MIT"
 readme = "README.md"
 exclude = ["riff/release", "riff/tests"]
+requires-python = ">=3.10"
 
 dependencies = [
     "gitpython == 3.1.43",
     "loguru == 0.7.3",
     "packaging == 23.2",
-    "python >=3.10",
     "typer == 0.15.1",
     "unidiff == 0.7.5",
     ]
