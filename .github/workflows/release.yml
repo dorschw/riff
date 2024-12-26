@@ -9,7 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: tox-dev/action-pre-commit-uv@v1
       - name: Build and publish to PyPi
-        uses: JRubics/poetry-publish@v2.0
         with:
-          pypi_token: ${{ secrets.PYPI_TOKEN }}
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: uv publish

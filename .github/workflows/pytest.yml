@@ -10,9 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-    - name: Install dependencies
-      run: poetry install --with dev
+    - uses: tox-dev/action-pre-commit-uv@v1
     - name: Run pytest
-      run: poetry run pytest .
+      run: uv run pytest .

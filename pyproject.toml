@@ -1,45 +1,6 @@
-[tool.poetry]
-name = "riff"
-version = "0.1.9.0"
-description = "Run ruff, but only fail on modified lines."
-authors = ["dorschw <81086590+dorschw@users.noreply.github.com>"]
-license = "MIT"
-readme = "README.md"
-exclude = ["riff/release", "riff/tests"]
-
-[tool.poetry.urls]
-"Homepage" = "https://github.com/dorschw/riff"
-"Source" = "https://github.com/dorschw/riff"
-"Bug Tracker" = "https://github.com/dorschw/riff/issues"
-
-[tool.poetry.dependencies]
-python = "^3.10"
-typer = ">=0.7.0"
-unidiff = "^0.7.5"
-loguru = "^0.7.0"
-gitpython = "^3.1.27"
-packaging = "^23.2"
-
-
-[tool.poetry.group.dev]
-optional = true
-
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.8.1"
-pre-commit = "^4.0.0"
-pytest = "^8.0.0"
-ipykernel = "^6.25.1"
-toml = "^0.10.2"
-types-unidiff = "^0.7.0.20240505"
-types-toml = "^0.10.8.20240310"
-pytest-mock = "^3.14.0"
-
-[tool.poetry.scripts]
-riff = "riff.riff:app"
-
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.ruff]
 lint.select = ["ALL"]
@@ -62,3 +23,40 @@ line-length = 88
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "loguru".msg = "use riff.logger instead"
+
+[project]
+name = "riff"
+version = "0.1.9.0"
+description = "Run ruff, but only fail on modified lines."
+authors = [{"name"="dorschw", "email"="81086590+dorschw@users.noreply.github.com"},]
+license = "MIT"
+readme = "README.md"
+exclude = ["riff/release", "riff/tests"]
+
+dependencies = [
+    "gitpython == 3.1.43",
+    "loguru == 0.7.3",
+    "packaging == 23.2",
+    "python >=3.10",
+    "typer == 0.15.1",
+    "unidiff == 0.7.5",
+    ]
+[project.scripts]
+riff = "riff.riff:app"
+
+[project.optional-dependencies]
+dev = [
+    "ruff == 0.8.3",
+    "pre-commit == 4.0.1",
+    "pytest == 8.3.4",
+    "ipykernel == 6.29.5",
+    "toml == 0.10.2",
+    "types-unidiff == 0.7.0.20240505",
+    "types-toml == 0.10.8.20240310",
+    "pytest-mock == 3.14.0",
+    ]
+
+[project.urls]
+"Homepage" = "https://github.com/dorschw/riff"
+"Source" = "https://github.com/dorschw/riff"
+"Bug Tracker" = "https://github.com/dorschw/riff/issues"
