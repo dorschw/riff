@@ -34,17 +34,17 @@ class Violation(NamedTuple):
     def github_annotation(self: "Violation") -> str:
         relative_path = self.path.relative_to(Path.cwd())
         annotation_parts = [f"::error file={relative_path}", f"line={self.line_start}"]
-        
+
         if self.line_end:
             annotation_parts.append(f"endLine={self.line_end}")
-        
+
         if self.column_start:
             annotation_parts.append(f"col={self.column_start}")
-        
+
         if self.column_end:
             annotation_parts.append(f"endColumn={self.column_end}")
 
-        return ",".join(annotation_parts) + f'::Ruff {self.error_code}: {self.message}'
+        return ",".join(annotation_parts) + f"::Ruff {self.error_code}: {self.message}"
 
     @staticmethod
     def parse(raw: dict) -> "Violation":
