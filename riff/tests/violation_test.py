@@ -23,7 +23,7 @@ VIOLATIONS_EXPECTED_ANNOTATIONS = [
         ),
         (
             "::error file=file.py,line=10,endLine=12,col=5,endColumn=20::"
-            'Ruff E123 (Indentation error)'
+            'Ruff E123: Indentation error'
         ),
         id="Full data",
     ),
