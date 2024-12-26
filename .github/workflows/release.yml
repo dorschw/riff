@@ -9,7 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: tox-dev/action-pre-commit-uv@v1
       - name: Build and publish to PyPi
         with:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}

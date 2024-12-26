@@ -10,6 +10,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: tox-dev/action-pre-commit-uv@v1
     - name: Run pytest
       run: uv run --all-extras pytest .
