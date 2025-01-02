@@ -35,7 +35,7 @@ exclude = ["riff/release", "riff/tests"]
 requires-python = ">=3.10"
 
 dependencies = [
-    "gitpython == 3.1.43",
+    "gitpython ==3.1.44",
     "loguru == 0.7.3",
     "packaging ==24.2",
     "typer == 0.15.1",
