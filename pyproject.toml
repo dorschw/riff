@@ -46,7 +46,7 @@ riff = "riff.riff:app"
 
 [project.optional-dependencies]
 dev = [
-    "ruff == 0.8.3",
+    "ruff ==0.8.5",
     "pre-commit == 4.0.1",
     "pytest == 8.3.4",
     "ipykernel == 6.29.5",
