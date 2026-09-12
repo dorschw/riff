@@ -31,7 +31,7 @@ repos:
         stages: [pre-push]
 
   - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.23
+    rev: 0.26
     hooks:
       - id: validate-pyproject
         stages: [pre-push]
